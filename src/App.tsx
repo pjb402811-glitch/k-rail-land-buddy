@@ -245,6 +245,7 @@ export default function App() {
                           setSelectedParcelId(id);
                         }}
                         parcels={parcels}
+                        hideRightPanel={true}
                       />
                     </motion.div>
                   )}

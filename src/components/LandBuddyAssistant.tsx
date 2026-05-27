@@ -20,9 +20,10 @@ interface AssistantProps {
   activeParcelId?: string | null;
   onSelectParcel?: (id: string) => void;
   parcels: LandParcel[]; // 실시간 동적 유휴부지 자산 DB
+  hideRightPanel?: boolean; // 우측 가이드 및 프리셋 패널 숨김 여부 (모바일 대응)
 }
 
-export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSelectParcel, parcels }: AssistantProps) {
+export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSelectParcel, parcels, hideRightPanel }: AssistantProps) {
   const [messages, setMessages] = useState<LandBuddyMessage[]>([
     {
       id: 'welcome',
@@ -573,9 +574,9 @@ ${logs.join('\n')}
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto min-h-[680px]" id="landbuddy_assistant_container">
+    <div className={`flex flex-col ${hideRightPanel ? 'w-full h-[730px]' : 'lg:flex-row gap-6 max-w-7xl mx-auto min-h-[680px]'}`} id="landbuddy_assistant_container">
       {/* 좌측 모바일 맞춤형 비서형 뷰포트 (글래스모피즘 적용) */}
-      <div className="w-full lg:w-7/12 glass-panel rounded-3xl border border-white/30 shadow-2xl flex flex-col h-[700px] overflow-hidden" id="chatbot_viewport">
+      <div className={`w-full ${hideRightPanel ? 'h-full rounded-2xl border-none shadow-none bg-[#F4F7F9]' : 'lg:w-7/12 glass-panel rounded-3xl border border-white/30 shadow-2xl'} flex flex-col overflow-hidden`} id="chatbot_viewport">
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-[#00529C] to-[#00874e] p-4 flex items-center justify-between text-white shadow-md" id="chatbot_header">
           <div className="flex items-center gap-3">
@@ -1048,61 +1049,63 @@ ${logs.join('\n')}
       </div>
 
       {/* 우측 꿀팁 가이드 및 프리셋 부지 카드 */}
-      <div className="w-full lg:w-5/12 space-y-5" id="chatbot_guide_sidebar">
-        {/* 프리셋 빠른 매칭 카드 */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-xs p-5 space-y-4" id="preset_queries_card">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center border border-indigo-100 shrink-0">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
+      {!hideRightPanel && (
+        <div className="w-full lg:w-5/12 space-y-5 animate-in fade-in duration-300" id="chatbot_guide_sidebar">
+          {/* 프리셋 빠른 매칭 카드 */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-xs p-5 space-y-4" id="preset_queries_card">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center border border-indigo-100 shrink-0">
+                <Sparkles className="w-4 h-4 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="font-sans font-bold text-gray-950 text-base leading-tight">랜드버디 빠른 매칭 프리셋</h3>
+                <p className="text-xs text-gray-500">한 번의 클릭으로 인공지능 공간 복지 비서를 깨우세요!</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-sans font-bold text-gray-950 text-base leading-tight">랜드버디 빠른 매칭 프리셋</h3>
-              <p className="text-xs text-gray-500">한 번의 클릭으로 인공지능 공간 복지 비서를 깨우세요!</p>
+
+            <div className="grid grid-cols-1 gap-2" id="preset_button_grid">
+              {LAND_BUDDY_PRESETS.map((p, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => {
+                    handleSendMessage(p.query);
+                  }}
+                  className="w-full text-left p-3 rounded-xl border border-gray-100 hover:border-[#00529C] hover:bg-blue-50/30 transition text-xs font-medium text-gray-700 hover:text-[#00529C] flex items-center justify-between group"
+                  id={`btn_preset_${idx}`}
+                >
+                  <span>{p.title}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#00529C] transition-transform group-hover:translate-x-1" />
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2" id="preset_button_grid">
-            {LAND_BUDDY_PRESETS.map((p, idx) => (
-              <button 
-                key={idx}
-                onClick={() => {
-                  handleSendMessage(p.query);
-                }}
-                className="w-full text-left p-3 rounded-xl border border-gray-100 hover:border-[#00529C] hover:bg-blue-50/30 transition text-xs font-medium text-gray-700 hover:text-[#00529C] flex items-center justify-between group"
-                id={`btn_preset_${idx}`}
-              >
-                <span>{p.title}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#00529C] transition-transform group-hover:translate-x-1" />
-              </button>
-            ))}
+          {/* 랜드버디 국유재산 대부 꿀팁 가이드 */}
+          <div className="bg-gradient-to-br from-[#00529C] to-blue-900 rounded-2xl p-5 text-white space-y-4 shadow-sm" id="regulatory_quick_guide">
+            <div className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-[#FFC107] animate-bounce" />
+              <h3 className="font-sans font-bold text-base">랜드버디 렌탈 상식 가이드</h3>
+            </div>
+
+            <div className="space-y-3.5 text-xs text-blue-100/90 leading-relaxed font-sans" id="guide_item_list">
+              <div className="bg-white/10 p-3 rounded-xl border border-white/15">
+                <strong className="text-[#FFC107] block mb-1">Q. 무단 점유는 어떻게 되나요?</strong>
+                철도공단의 허가 없이 철도보호구역이나 철도부지를 점용하면 벌칙금(변상금 120%) 부과 및 고발 조치됩니다! 랜드버디를 통해 정당하고 안전하게 대부 신청하십시오.
+              </div>
+
+              <div className="bg-white/10 p-3 rounded-xl border border-white/15">
+                <strong className="text-emerald-300 block mb-1">Q. 대부료 우대 혜택 적용 방법은?</strong>
+                일반 부지는 공시지가의 5%이지만, 농사 목적(주말농장 등)은 1%, 카페나 푸드트럭 창업 등 지역밀착 공간복지는 **익년 한시 특별 우대요율인 3%**로 전격 낮추어 드립니다.
+              </div>
+
+              <div className="bg-white/10 p-3 rounded-xl border border-white/15">
+                <strong className="text-sky-300 block mb-1">Q. 신청 시 준비 서류는?</strong>
+                랜드버디가 자동 생성 및 다운로드해 드리는 **'국유재산 대부 신청서 초안.txt'**와 주민등록등본(개인) 또는 사업자등록증명원(기업)만 지참하시면 영농 및 소상공인 공간 복지 안전 심사를 빠르게 통과할 수 있습니다.
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* 랜드버디 국유재산 대부 꿀팁 가이드 */}
-        <div className="bg-gradient-to-br from-[#00529C] to-blue-900 rounded-2xl p-5 text-white space-y-4 shadow-sm" id="regulatory_quick_guide">
-          <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-[#FFC107] animate-bounce" />
-            <h3 className="font-sans font-bold text-base">랜드버디 렌탈 상식 가이드</h3>
-          </div>
-
-          <div className="space-y-3.5 text-xs text-blue-100/90 leading-relaxed font-sans" id="guide_item_list">
-            <div className="bg-white/10 p-3 rounded-xl border border-white/15">
-              <strong className="text-[#FFC107] block mb-1">Q. 무단 점유는 어떻게 되나요?</strong>
-              철도공단의 허가 없이 철도보호구역이나 철도부지를 점용하면 벌칙금(변상금 120%) 부과 및 고발 조치됩니다! 랜드버디를 통해 정당하고 안전하게 대부 신청하십시오.
-            </div>
-
-            <div className="bg-white/10 p-3 rounded-xl border border-white/15">
-              <strong className="text-emerald-300 block mb-1">Q. 대부료 우대 혜택 적용 방법은?</strong>
-              일반 부지는 공시지가의 5%이지만, 농사 목적(주말농장 등)은 1%, 카페나 푸드트럭 창업 등 지역밀착 공간복지는 **익년 한시 특별 우대요율인 3%**로 전격 낮추어 드립니다.
-            </div>
-
-            <div className="bg-white/10 p-3 rounded-xl border border-white/15">
-              <strong className="text-sky-300 block mb-1">Q. 신청 시 준비 서류는?</strong>
-              랜드버디가 자동 생성 및 다운로드해 드리는 **'국유재산 대부 신청서 초안.txt'**와 주민등록등본(개인) 또는 사업자등록증명원(기업)만 지참하시면 영농 및 소상공인 공간 복지 안전 심사를 빠르게 통과할 수 있습니다.
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* 신청인 개인정보 입력 인텐트 모달 다이얼로그 */}
       {showNameModal && (

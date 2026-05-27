@@ -3,11 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#00529C" />
+    <link rel="apple-touch-icon" href="/k-rail-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
     <title>K-Rail Land-Buddy (케이레일 랜드버디) - 국가철도공단 유휴부지 전용 공간복지 비서</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then((reg) => console.log('PWA 서비스 워커 등록 완료: ', reg.scope))
+            .catch((err) => console.error('PWA 서비스 워커 등록 실패: ', err));
+        });
+      }
+    </script>
   </body>
 </html>
 

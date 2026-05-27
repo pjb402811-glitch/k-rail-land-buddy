@@ -1,0 +1,18 @@
+{
+  "name": "K-Rail Land-Buddy",
+  "short_name": "랜드버디",
+  "description": "국가철도공단 유휴부지 임대 및 공간 복지 맞춤형 비서 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F7F9",
+  "theme_color": "#00529C",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/k-rail-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
