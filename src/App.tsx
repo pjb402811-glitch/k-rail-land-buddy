@@ -130,10 +130,10 @@ export default function App() {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-mono text-[9px] bg-[#00529C]/10 border border-[#00529C]/20 text-[#00529C] px-1.5 py-0.5 rounded-md font-bold leading-none">
-                  K-Rail Space Orchestrator
+                  K-Rail Space Asset
                 </span>
                 <span className="text-gray-300 text-xs">|</span>
-                <span className="text-[10px] text-[#009C5E] font-bold tracking-tight">쏭비서 자동화 시스템</span>
+                <span className="text-[10px] text-[#009C5E] font-bold tracking-tight">공간 복지 통합 시스템</span>
               </div>
               <h1 className="font-sans font-bold text-gray-900 text-base leading-tight">
                 K-Rail Land-Buddy <span className="text-[#00529C] font-semibold text-xs tracking-wide">(케이레일 랜드버디)</span>
@@ -184,7 +184,7 @@ export default function App() {
               </div>
               <div className="text-left leading-tight">
                 <div className="font-bold text-gray-800">공간복지 가설처</div>
-                <div className="text-[10px] text-gray-400">쏭비서 AI 오퍼레이터</div>
+                <div className="text-[10px] text-gray-400">자산 전담 주임 심사관</div>
               </div>
             </div>
           </div>
@@ -366,7 +366,7 @@ export default function App() {
               <div className="flex bg-white/10 border border-white/20 px-4 py-3 rounded-2xl text-xs font-mono shrink-0 items-center gap-3">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                 <div>
-                  <div className="font-bold text-white">행정 오케스트레이터 온-라인</div>
+                  <div className="font-bold text-white">국유재산 통합포털 온-라인</div>
                   <div className="text-[10px] text-blue-200">김철수 심사관 권한 가동 중</div>
                 </div>
               </div>
