@@ -740,8 +740,8 @@ ${logs.join('\n')}
           </button>
         </div>
 
-        {/* 메시지 영역 */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F8F9FA]/60" id="chat_messages_area">
+        {/* 메시지 영역 (가로 스크롤 완전 방지 및 모바일 최적화 패딩 적용) */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-4 space-y-4 bg-[#F8F9FA]/60" id="chat_messages_area">
           {messages.map((msg) => (
             <motion.div 
               key={msg.id} 
@@ -785,9 +785,9 @@ ${logs.join('\n')}
 
                   {/* 봇 액션 카드 포맷 (추천 보고서 및 시뮬레이션 및 초안 포함) */}
                   {msg.sender === 'bot' && msg.actionCard?.type === 'recommend' && msg.actionCard.parcel && (
-                    <div className="space-y-3 bg-white border border-[#E9ECEF] rounded-2xl overflow-hidden shadow-md max-w-lg" id={`card_report_${msg.actionCard.parcel.id}`}>
+                    <div className="space-y-3 bg-white border border-[#E9ECEF] rounded-2xl overflow-hidden shadow-md w-full max-w-[330px] xs:max-w-[350px] sm:max-w-md mx-auto" id={`card_report_${msg.actionCard.parcel.id}`}>
                       {/* 부지 헤더 이미지 */}
-                      <div className="relative h-40 bg-gray-100 overflow-hidden">
+                      <div className="relative h-32 sm:h-40 bg-gray-100 overflow-hidden">
                         <img 
                           src={msg.actionCard.parcel.imageUrl || 'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80'} 
                           alt={msg.actionCard.parcel.id} 
@@ -915,43 +915,43 @@ ${logs.join('\n')}
 
                         {/* 자동 완성된 표 */}
                         <div className="border border-gray-200 rounded-xl overflow-hidden shadow-2xs">
-                          <table className="w-full text-xs text-left" id="applicant_form_table">
+                          <table className="w-full table-fixed text-[11px] text-left" id="applicant_form_table">
                             <thead className="bg-gray-50 border-b border-gray-200">
                               <tr>
-                                <th className="p-2.5 font-semibold text-gray-700 w-1/3">서식 항목</th>
-                                <th className="p-2.5 font-semibold text-gray-700">자동 완성 내용</th>
+                                <th className="p-2 font-semibold text-gray-700 w-[85px] sm:w-[100px]">서식 항목</th>
+                                <th className="p-2 font-semibold text-gray-700">자동 완성 내용</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
                               <tr>
-                                <td className="p-2.5 font-medium text-gray-500 bg-gray-50/50">신청인 정보</td>
-                                <td className="p-2.5">
+                                <td className="p-2 font-medium text-gray-500 bg-gray-50/50">신청인 정보</td>
+                                <td className="p-2 break-all">
                                   {applicantName ? (
                                     <span className="font-bold text-gray-900 font-sans">
                                       {applicantName} <span className="text-gray-400 font-normal">({applicantType})</span>
                                     </span>
                                   ) : (
                                     <span className="font-bold text-red-500 animate-pulse flex items-center gap-1">
-                                      <AlertCircle className="w-3 h-3" /> 신청인 정보 미입력
+                                      <AlertCircle className="w-3 h-3 shrink-0" /> 미입력
                                     </span>
                                   )}
                                 </td>
                               </tr>
                               <tr>
-                                <td className="p-2.5 font-medium text-gray-500 bg-gray-50/50">신청 부지</td>
-                                <td className="p-2.5 font-semibold text-gray-800 font-mono">
+                                <td className="p-2 font-medium text-gray-500 bg-gray-50/50">신청 부지</td>
+                                <td className="p-2 font-semibold text-gray-800 font-mono break-all leading-tight">
                                   {msg.actionCard.parcel.id} ({msg.actionCard.parcel.address.split('(')[0].trim()})
                                 </td>
                               </tr>
                               <tr>
-                                <td className="p-2.5 font-medium text-gray-500 bg-gray-50/50">사업 목적</td>
-                                <td className="p-2.5 font-sans font-medium text-gray-700">
+                                <td className="p-2 font-medium text-gray-500 bg-gray-50/50">사업 목적</td>
+                                <td className="p-2 font-sans font-medium text-gray-700 break-all leading-tight">
                                   {msg.actionCard.parcel.recommendedUse.split('·')[0]} 공간 대부
                                 </td>
                               </tr>
                               <tr>
-                                <td className="p-2.5 font-medium text-gray-500 bg-gray-50/50">희망 대부기간</td>
-                                <td className="p-2.5 font-mono text-gray-700">
+                                <td className="p-2 font-medium text-gray-500 bg-gray-50/50">희망 대부기간</td>
+                                <td className="p-2 font-mono text-gray-700">
                                   {selectedLeasePeriod}개월 ({Math.round(selectedLeasePeriod / 12 * 10) / 10}년)
                                 </td>
                               </tr>

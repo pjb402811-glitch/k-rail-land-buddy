@@ -231,8 +231,8 @@ export default function App() {
               <div className="w-10 h-1 bg-gray-950/80 rounded-full" />
             </div>
 
-            {/* 스마트폰 내부 액정 화면 (액정 규격 내 독립 스크롤 적용) */}
-            <div className="flex-1 bg-[#F4F7F9] overflow-y-auto flex flex-col relative pt-7 scrollbar-thin select-none" id="mobile_liquid_screen">
+            {/* 스마트폰 내부 액정 화면 (액정 규격 내 독립 스크롤 및 가로 스크롤 완전 방지 적용) */}
+            <div className="flex-1 bg-[#F4F7F9] overflow-y-auto overflow-x-hidden flex flex-col relative pt-7 scrollbar-thin select-none" id="mobile_liquid_screen">
               
               {/* 모바일 상단 폰 전용 노티바 (Status Bar) */}
               <div className="absolute top-0 inset-x-0 h-7 px-6 flex items-center justify-between text-[10.5px] font-bold text-gray-700 z-40 bg-[#F4F7F9]/80 backdrop-blur-xs select-none">
