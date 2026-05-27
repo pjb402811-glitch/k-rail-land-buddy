@@ -430,6 +430,7 @@ export default function App() {
                 >
                   <AdminDashboard 
                     applications={applications}
+                    parcels={parcels}
                     onSelectApplication={(id) => {
                       setSelectedReviewAppId(id);
                       setAdminTab('review');
