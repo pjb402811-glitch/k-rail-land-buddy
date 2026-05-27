@@ -35,8 +35,10 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
     const monthNum = idx + 1; // 1, 2, 3, 4, 5
     
     // 해당 월에 접수된 '승인' 상태의 실제 신청서 필터링 ( appliedDate: '2026-05-20' 포맷 파싱 )
-    const monthApps = applications.filter(app => {
+    const monthApps = (applications || []).filter(app => {
+      if (!app) return false;
       if (app.status !== '승인') return false;
+      if (!app.appliedDate || typeof app.appliedDate !== 'string') return false;
       const dateParts = app.appliedDate.split('-');
       if (dateParts.length >= 2) {
         const appMonth = parseInt(dateParts[1], 10);
@@ -45,7 +47,7 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
       return false;
     });
 
-    const revenueSum = monthApps.reduce((sum, current) => sum + current.monthlyFee, 0);
+    const revenueSum = monthApps.reduce((sum, current) => sum + (current.monthlyFee || 0), 0);
     return {
       month: monthStr,
       revenue: revenueSum, // 원화 그대로 보존
@@ -59,18 +61,23 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
   const yAxisMax = Math.ceil(maxRevenueVal / 100000) * 100000; // 10만 원 단위 올림
 
   // 3. 🎯 대부 용도 분포 (Lease Status) 실데이터 기반 실시간 구성비 통계
-  const totalParcelsCount = parcels.length || 1;
-  const commercialCount = parcels.filter(p => 
-    p.recommendedUse.includes('창업') || p.recommendedUse.includes('푸드트럭') || 
-    p.recommendedUse.includes('카페') || p.recommendedUse.includes('상업') || 
-    p.recommendedUse.includes('매장') || p.recommendedUse.includes('플리마켓')
-  ).length;
+  const totalParcelsCount = (parcels || []).length || 1;
+  
+  const commercialCount = (parcels || []).filter(p => {
+    if (!p || !p.recommendedUse || typeof p.recommendedUse !== 'string') return false;
+    const use = p.recommendedUse;
+    return use.includes('창업') || use.includes('푸드트럭') || 
+           use.includes('카페') || use.includes('상업') || 
+           use.includes('매장') || use.includes('플리마켓');
+  }).length;
 
-  const industrialCount = parcels.filter(p => 
-    p.recommendedUse.includes('물류') || p.recommendedUse.includes('야적장') || 
-    p.recommendedUse.includes('주차장') || p.recommendedUse.includes('창고') ||
-    p.recommendedUse.includes('주차')
-  ).length;
+  const industrialCount = (parcels || []).filter(p => {
+    if (!p || !p.recommendedUse || typeof p.recommendedUse !== 'string') return false;
+    const use = p.recommendedUse;
+    return use.includes('물류') || use.includes('야적장') || 
+           use.includes('주차장') || use.includes('창고') ||
+           use.includes('주차');
+  }).length;
 
   const publicCount = Math.max(0, totalParcelsCount - commercialCount - industrialCount);
 
@@ -102,15 +109,16 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
     const csvRows = [
       ["부지번호(Site ID)", "소재지(Address)", "면적(Area, ㎡)", "지목(Type)", "공시지가(Official Price)", "상태(Status)", "추천용도(Use)"]
     ];
-    parcels.forEach(p => {
+    (parcels || []).forEach(p => {
+      if (!p) return;
       csvRows.push([
-        p.id, 
-        p.address.replace(/,/g, ''), 
-        p.area.toString(), 
-        p.landType, 
-        p.officialPrice.toString(), 
-        p.status, 
-        p.recommendedUse.replace(/,/g, '')
+        p.id || '', 
+        (p.address || '').replace(/,/g, ''), 
+        (p.area || 0).toString(), 
+        p.landType || '', 
+        (p.officialPrice || 0).toString(), 
+        p.status || '', 
+        (p.recommendedUse || '').replace(/,/g, '')
       ]);
     });
     

@@ -32,7 +32,14 @@ export default function App() {
     const saved = localStorage.getItem('k_rail_land_buddy_parcels');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // 데이터 유효성 검증: 필수 키들이 있는지 방어적으로 확인
+          const first = parsed[0];
+          if (first && first.id && first.address) {
+            return parsed;
+          }
+        }
       } catch (e) {
         console.error('Failed to parse saved parcels', e);
       }
@@ -44,7 +51,18 @@ export default function App() {
     const saved = localStorage.getItem('k_rail_land_buddy_apps');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // 구버전 데이터 검출 및 강제 마이그레이션 방어선
+          // 옛날 데이터(appliedDate가 없거나 structure가 깨진 것) 감지 시, 구버전은 비우고 최신 데이터로 복원
+          const hasOutdated = parsed.some(app => !app || !app.id || !app.appliedDate || typeof app.monthlyFee !== 'number');
+          if (hasOutdated) {
+            console.warn('구버전 대부 신청서 데이터 포맷 감지. 강제 마이그레이션을 위해 초기화합니다.');
+            localStorage.removeItem('k_rail_land_buddy_apps');
+            return INITIAL_APPLICATIONS;
+          }
+          return parsed;
+        }
       } catch (e) {
         console.error('Failed to parse saved applications', e);
       }
