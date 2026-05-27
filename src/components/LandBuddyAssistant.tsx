@@ -19,9 +19,10 @@ interface AssistantProps {
   onApplySubmit: (app: LeaseApplication) => void;
   activeParcelId?: string | null;
   onSelectParcel?: (id: string) => void;
+  parcels: LandParcel[]; // 실시간 동적 유휴부지 자산 DB
 }
 
-export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSelectParcel }: AssistantProps) {
+export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSelectParcel, parcels }: AssistantProps) {
   const [messages, setMessages] = useState<LandBuddyMessage[]>([
     {
       id: 'welcome',
@@ -48,7 +49,7 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
   const [apiKey, setApiKey] = useState<string>(() => {
     const savedKey = localStorage.getItem('k_rail_gemini_api_key');
     if (savedKey) return savedKey;
-    return (import.meta.env.VITE_GEMINI_API_KEY as string) || '';
+    return ((import.meta as any).env?.VITE_GEMINI_API_KEY as string) || '';
   });
   const [publicDataKey, setPublicDataKey] = useState<string>(() => {
     return localStorage.getItem('k_rail_public_data_key') || '';
@@ -74,12 +75,12 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
   // Handle activeParcelId from external clicks (like Inventory detail)
   useEffect(() => {
     if (activeParcelId) {
-      const parcel = LAND_PARCELS.find(p => p.id === activeParcelId);
+      const parcel = parcels.find(p => p.id === activeParcelId);
       if (parcel) {
         handleSelectParcel(parcel);
       }
     }
-  }, [activeParcelId]);
+  }, [activeParcelId, parcels]);
 
   // 대부요율 계산 도우미
   const getRateAndLabel = (recommendedUse: string): { rate: number; label: string; ratePct: number } => {
@@ -207,28 +208,30 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
       let logs: string[] = [];
       let assembledParcel: LandParcel | null = null;
 
-      // 1. 자연어 쿼리 분석 및 내부 DB에서 후보 부지 탐색
+      // 1. 자연어 쿼리 분석 및 내부 DB(parcels 프로퍼티)에서 후보 부지 탐색 (엑셀 업로드 자산 포함!)
       const lowerText = text.toLowerCase();
       let foundParcel: LandParcel | null = null;
 
-      if (lowerText.includes('대전역') || lowerText.includes('정동') || lowerText.includes('푸드') || lowerText.includes('창업') || lowerText.includes('001')) {
-        foundParcel = LAND_PARCELS[0];
-      } else if (lowerText.includes('농장') || lowerText.includes('경작') || lowerText.includes('텃밭') || lowerText.includes('서구') || lowerText.includes('002')) {
-        foundParcel = LAND_PARCELS[1];
-      } else if (lowerText.includes('세종') || lowerText.includes('조치원') || lowerText.includes('카페') || lowerText.includes('마켓') || lowerText.includes('003')) {
-        foundParcel = LAND_PARCELS[2];
-      } else if (lowerText.includes('신탄진') || lowerText.includes('물류') || lowerText.includes('야적') || lowerText.includes('004')) {
-        foundParcel = LAND_PARCELS[3];
-      } else if (lowerText.includes('용산') || lowerText.includes('교량') || lowerText.includes('서울') || lowerText.includes('005')) {
-        foundParcel = LAND_PARCELS[4];
-      } else if (lowerText.includes('부산') || lowerText.includes('초량') || lowerText.includes('006')) {
-        foundParcel = LAND_PARCELS[5];
-      } else if (lowerText.includes('대구') || lowerText.includes('신암') || lowerText.includes('007')) {
-        foundParcel = LAND_PARCELS[6];
-      } else if (lowerText.includes('광주') || lowerText.includes('송정') || lowerText.includes('008')) {
-        foundParcel = LAND_PARCELS[7];
-      } else if (lowerText.includes('강릉') || lowerText.includes('자전거') || lowerText.includes('009')) {
-        foundParcel = LAND_PARCELS[8];
+      // 주소, 부지ID, 용도 단어 매핑으로 스마트 매칭 (초정밀 파서)
+      foundParcel = parcels.find(p => 
+        lowerText.includes(p.id.toLowerCase()) || 
+        p.address.split(' ').some(word => word.length > 1 && lowerText.includes(word.toLowerCase())) ||
+        p.recommendedUse.split('·').some(word => word.length > 1 && lowerText.includes(word.toLowerCase()))
+      ) || null;
+
+      // 발견하지 못한 경우 표준 룰셋으로 강제 폴백
+      if (!foundParcel) {
+        if (lowerText.includes('대전역') || lowerText.includes('정동') || lowerText.includes('001')) {
+          foundParcel = parcels.find(p => p.id === 'KR-001') || parcels[0];
+        } else if (lowerText.includes('농장') || lowerText.includes('경작') || lowerText.includes('텃밭') || lowerText.includes('서구') || lowerText.includes('002')) {
+          foundParcel = parcels.find(p => p.id === 'KR-002') || parcels[1];
+        } else if (lowerText.includes('세종') || lowerText.includes('조치원') || lowerText.includes('003')) {
+          foundParcel = parcels.find(p => p.id === 'KR-003') || parcels[2];
+        } else if (lowerText.includes('신탄진') || lowerText.includes('물류') || lowerText.includes('야적') || lowerText.includes('004')) {
+          foundParcel = parcels.find(p => p.id === 'KR-004') || parcels[3];
+        } else if (lowerText.includes('용산') || lowerText.includes('교량') || lowerText.includes('서울') || lowerText.includes('005')) {
+          foundParcel = parcels.find(p => p.id === 'KR-05') || parcels[4];
+        }
       }
 
       // 2. 부지가 매칭된 경우 국토교통부/브이월드 공간 API 실시간 체이닝(Chaining) 작동!
