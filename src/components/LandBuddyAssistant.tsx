@@ -49,7 +49,7 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
   const [apiKey, setApiKey] = useState<string>(() => {
     const savedKey = localStorage.getItem('k_rail_gemini_api_key');
     if (savedKey) return savedKey;
-    return ((import.meta as any).env?.VITE_GEMINI_API_KEY as string) || '';
+    return ((import.meta as any).env?.VITE_GEMINI_API_KEY as string) || 'AIzaSyBaOd9D3Jnqyrwo-kxacF9495SXkjhOk8U';
   });
   const [publicDataKey, setPublicDataKey] = useState<string>(() => {
     return localStorage.getItem('k_rail_public_data_key') || '';
