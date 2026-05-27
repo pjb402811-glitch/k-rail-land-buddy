@@ -1,0 +1,6 @@
+{
+  "name": "K-Rail Land-Buddy",
+  "description": "국가철도공단(KR)의 유휴부지 대부(렌탈) 및 공간 복지 맞춤형 비서 서비스로, 일반 국민, 소상공인, 청년창업가들이 철도 인접 유휴부지를 쉽게 렌탈하고 국유재산 대부 신청을 진행할 수 있도록 돕습니다.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
