@@ -1,6 +1,6 @@
 {
-  "name": "K-Rail Land-Buddy",
-  "short_name": "랜드버디",
+  "name": "KR-Land Buddy",
+  "short_name": "KR랜드버디",
   "description": "국가철도공단 유휴부지 임대 및 공간 복지 맞춤형 비서 서비스",
   "start_url": "/",
   "display": "standalone",

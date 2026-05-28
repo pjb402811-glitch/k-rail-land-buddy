@@ -4,90 +4,158 @@
 @theme {
   --font-sans: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", sans-serif;
+  
+  /* HSL Tailored Premium Colors */
+  --color-brand-blue: hsl(211, 100%, 25%);
+  --color-brand-blue-deep: hsl(211, 100%, 15%);
+  --color-brand-blue-light: hsl(211, 100%, 96%);
+  --color-brand-blue-glow: rgba(0, 82, 156, 0.15);
+  
+  --color-brand-green: hsl(164, 76%, 32%);
+  --color-brand-green-deep: hsl(164, 76%, 22%);
+  --color-brand-green-light: hsl(164, 76%, 95%);
+  
+  --color-brand-dark: hsl(222, 47%, 9%);
+  --color-brand-dark-card: hsl(222, 47%, 14%);
+  --color-brand-gold: hsl(38, 92%, 50%);
+  --color-brand-gold-light: hsl(38, 92%, 95%);
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #f4f7f9;
+  background-color: hsl(210, 20%, 98%);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(0, 82, 156, 0.03) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(0, 156, 94, 0.03) 0px, transparent 50%);
-  color: #1a1f24;
+    radial-gradient(at 0% 0%, hsla(211, 100%, 25%, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(164, 76%, 32%, 0.05) 0px, transparent 50%);
+  color: hsl(222, 47%, 11%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.015em;
+  line-height: 1.6;
 }
 
 h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);
+  letter-spacing: -0.025em;
 }
 
-/* 프리미엄 글래스모피즘 & 레이아웃 유틸리티 */
+/* 프리미엄 글래스모피즘 & 레이아웃 유틸리티 (3차원 깊이감 강화) */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(120%);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   box-shadow: 
-    0 4px 30px rgba(0, 0, 0, 0.02),
-    0 1px 3px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 10px 40px -10px rgba(0, 82, 156, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.01),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 1.5rem;
 }
 
 .glass-card {
   background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 
-    0 2px 12px rgba(0, 0, 0, 0.01),
-    0 1px 2px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    0 4px 20px -2px rgba(0, 82, 156, 0.02),
+    0 1px 2px rgba(0, 0, 0, 0.01),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
   background: rgba(255, 255, 255, 0.65);
-  border-color: rgba(0, 82, 156, 0.2);
-  transform: translateY(-2px);
+  border-color: hsla(211, 100%, 25%, 0.18);
+  transform: translateY(-3px) scale(1.01);
   box-shadow: 
-    0 12px 24px rgba(0, 82, 156, 0.04),
-    0 4px 8px rgba(0, 82, 156, 0.02);
+    0 20px 35px -5px rgba(0, 82, 156, 0.08),
+    0 8px 16px -6px rgba(0, 82, 156, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .glass-dark {
-  background: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(11, 17, 30, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* 프리미엄 텍스트 & 그라디언트 */
 .gradient-text {
-  background: linear-gradient(135deg, #00529C 0%, #009C5E 100%);
+  background: linear-gradient(135deg, hsl(211, 100%, 25%) 0%, hsl(164, 76%, 32%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-bg-light {
-  background: linear-gradient(135deg, rgba(0, 82, 156, 0.02) 0%, rgba(0, 156, 94, 0.02) 100%);
+  background: linear-gradient(135deg, hsla(211, 100%, 25%, 0.02) 0%, hsla(164, 76%, 32%, 0.02) 100%);
 }
 
-.gradient-btn-premium {
-  background: linear-gradient(135deg, #00529C 0%, #00874e 100%);
+/* 고급형 마이크로 애니메이션 버튼 클래스 */
+.btn-premium-luxury {
+  background: linear-gradient(135deg, hsl(211, 100%, 25%) 0%, hsl(211, 100%, 20%) 100%);
   box-shadow: 
     0 4px 14px rgba(0, 82, 156, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.2s ease;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.gradient-btn-premium:hover {
+.btn-premium-luxury:hover {
   filter: brightness(1.08);
+  transform: translateY(-2px) scale(1.02);
   box-shadow: 
-    0 6px 20px rgba(0, 82, 156, 0.35),
+    0 8px 24px rgba(0, 82, 156, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-premium-luxury:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 럭셔리 에메랄드 버튼 */
+.btn-premium-jade {
+  background: linear-gradient(135deg, hsl(164, 76%, 32%) 0%, hsl(164, 76%, 26%) 100%);
+  box-shadow: 
+    0 4px 14px rgba(0, 156, 94, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-premium-jade:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 8px 24px rgba(0, 156, 94, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-premium-jade:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 럭셔리 탭 전환 및 마이크로 효과 */
+.tab-luxury {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: -0.01em;
+}
+
+.tab-luxury:hover {
+  transform: translateY(-1px);
+}
+
+/* 챗봇 버블 자연스러운 스프링 로딩용 클래스 */
+.chatbot-bubble-spring {
+  animation: bubble-spring 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes bubble-spring {
+  0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 /* 스크롤바 최적화 */
@@ -109,5 +177,6 @@ h1, h2, h3, h4, .font-display {
 .animate-infinite-loading {
   animation: infinite-loading 1.8s infinite linear;
 }
+
 
 

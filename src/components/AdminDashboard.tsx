@@ -138,59 +138,59 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
       {/* ⚡ 최상단 통계 그리드 (실시간 100% 실데이터 연동 지표) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="stats_cards_grid">
         {/* 카드 1: 총 관리부지 */}
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-xs p-5 flex items-center justify-between" id="stat_card_total_land">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">TOTAL MANAGED LAND (총 관리부지)</span>
-            <div className="text-2xl font-black text-[#00529C] font-mono">{totalLandCount.toLocaleString()} 필지</div>
-            <span className="text-[10.5px] text-[#009C5E] font-bold flex items-center gap-0.5">
-              <ShieldCheck className="w-3.5 h-3.5 inline" /> 대표님이 심은 엑셀/PDF 실데이터 100% 반영
+        <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="stat_card_total_land">
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">TOTAL MANAGED LAND (총 관리부지)</span>
+            <div className="text-2xl font-black text-brand-blue font-mono leading-none">{totalLandCount.toLocaleString()} 필지</div>
+            <span className="text-[10.5px] text-brand-green font-extrabold flex items-center gap-0.5">
+              <ShieldCheck className="w-3.5 h-3.5 inline text-brand-green" /> 실데이터 100% 반영
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#00529C] shadow-3xs shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-brand-blue-light text-brand-blue flex items-center justify-center shadow-3xs shrink-0 border border-brand-blue/10">
             <Landmark className="w-6 h-6" />
           </div>
         </div>
 
         {/* 카드 2: 활성 대부 계약 */}
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-xs p-5 flex items-center justify-between" id="stat_card_active_lease">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">ACTIVE LEASES (활성 대부건수)</span>
-            <div className="text-2xl font-black text-gray-900 font-mono">{activeLeasesCount} 건</div>
-            <span className="text-[10.5px] text-gray-500 block font-medium">행정 승인이 발효된 계약 실시간 통계</span>
+        <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="stat_card_active_lease">
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">ACTIVE LEASES (활성 대부건수)</span>
+            <div className="text-2xl font-black text-gray-950 font-mono leading-none">{activeLeasesCount} 건</div>
+            <span className="text-[10.5px] text-gray-500 block font-semibold">승인이 발효된 계약 통계</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-700 shadow-3xs shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-brand-green-light text-brand-green flex items-center justify-center shadow-3xs shrink-0 border border-brand-green/10 animate-pulse">
             <ShieldCheck className="w-6 h-6" />
           </div>
         </div>
 
         {/* 카드 3: 월평균 대부료 */}
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-xs p-5 flex items-center justify-between" id="stat_card_revenue">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">MONTHLY REVENUE (월평균 대부료)</span>
-            <div className="text-2xl font-black text-[#009C5E] font-mono">
+        <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="stat_card_revenue">
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">MONTHLY REVENUE (월평균 대부료)</span>
+            <div className="text-2xl font-black text-brand-green font-mono leading-none">
               {totalMonthlyRevenue >= 10000 
                 ? `₩${Math.round(totalMonthlyRevenue / 10000).toLocaleString()}만` 
                 : `₩${totalMonthlyRevenue.toLocaleString()}원`}
             </div>
-            <span className="text-[10.5px] text-[#009C5E] font-bold flex items-center gap-0.5 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100/50">
-              <TrendingUp className="w-3.5 h-3.5 inline text-[#009C5E]" /> 결재 승인된 진짜 수익 지표
+            <span className="text-[10.5px] text-brand-green font-extrabold flex items-center gap-0.5 bg-brand-green-light px-2 py-0.5 rounded-lg border border-brand-green/10">
+              <TrendingUp className="w-3.5 h-3.5 inline" /> 승인된 순수익 지표
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-[#009C5E] shadow-3xs shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-brand-green-light text-brand-green flex items-center justify-center shadow-3xs shrink-0 border border-brand-green/10">
             <Landmark className="w-6 h-6" />
           </div>
         </div>
 
         {/* 카드 4: 대기중 행정 심사 */}
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-xs p-5 flex items-center justify-between" id="stat_card_pending_apps">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">PENDING APPS (대기중 심사)</span>
-            <div className="text-2xl font-black text-amber-600 font-mono">{pendingLeasesCount} 건</div>
-            <span className="text-[10.5px] text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100/50">
-              실시간 접수되어 검토 중인 서류
+        <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="stat_card_pending_apps">
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">PENDING APPS (대기중 심사)</span>
+            <div className="text-2xl font-black text-amber-600 font-mono leading-none">{pendingLeasesCount} 건</div>
+            <span className="text-[10.5px] text-amber-700 font-extrabold bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
+              실시간 검토중 서류
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-700 shadow-3xs shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center shadow-3xs shrink-0 border border-amber-200/50">
             <Calendar className="w-6 h-6" />
           </div>
         </div>
@@ -199,83 +199,83 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
       {/* 📊 실시간 차트 분석 그리드 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6" id="charts_layout_grid">
         {/* 차트 1: Revenue Trends */}
-        <div className="bg-white rounded-2xl border border-gray-150 shadow-xs p-6 lg:col-span-8 flex flex-col justify-between" id="chart_revenue_trends">
+        <div className="glass-card p-6 lg:col-span-8 flex flex-col justify-between rounded-3xl" id="chart_revenue_trends">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-sans font-bold text-[#020617] text-base leading-tight">Revenue Trends (실제 대부료 누적 수익 추이)</h3>
-              <p className="text-xs text-gray-500">신청-심사-승인을 통과한 자산의 실시간 월별 매출액</p>
+              <h3 className="font-sans font-black text-gray-950 text-base leading-tight tracking-tight">Revenue Trends (실제 대부료 누적 수익 추이)</h3>
+              <p className="text-xs text-gray-400 font-semibold mt-0.5">신청-심사-승인을 통과한 자산의 실시간 월별 매출액</p>
             </div>
-            <div className="flex bg-gray-55 border border-gray-150 p-1 rounded-lg text-xs" id="chart_period_toggle">
-              <span className="px-3 py-1.5 bg-white shadow-3xs rounded-md font-bold text-[#00529C]">실제 승인 데이터 연동</span>
+            <div className="flex bg-slate-50 border border-slate-100 p-1 rounded-xl text-xs" id="chart_period_toggle">
+              <span className="px-3.5 py-1.5 bg-white shadow-3xs rounded-lg font-extrabold text-brand-blue border border-slate-150">실제 승인 데이터 연동</span>
             </div>
           </div>
 
           {/* 세련된 반응형 커스텀 SVG 차트 */}
           <div className="relative h-64 flex items-end justify-between px-4 pt-6 pb-2" id="custom_svg_revenue_chart">
             {/* 세로 눈금선 */}
-            <div className="absolute inset-0 flex flex-col justify-between text-[10px] text-gray-400 font-mono pointer-events-none pb-8 select-none">
-              <div className="border-b border-gray-100 w-full text-right pr-2">₩{(yAxisMax / 10000).toLocaleString()}만</div>
-              <div className="border-b border-gray-100 w-full text-right pr-2">₩{(yAxisMax * 0.75 / 10000).toLocaleString()}만</div>
-              <div className="border-b border-gray-100 w-full text-right pr-2">₩{(yAxisMax * 0.5 / 10000).toLocaleString()}만</div>
-              <div className="border-b border-gray-100 w-full text-right pr-2">₩{(yAxisMax * 0.25 / 10000).toLocaleString()}만</div>
+            <div className="absolute inset-0 flex flex-col justify-between text-[10px] text-slate-400 font-mono pointer-events-none pb-8 select-none font-bold">
+              <div className="border-b border-slate-100 w-full text-right pr-2">₩{(yAxisMax / 10000).toLocaleString()}만</div>
+              <div className="border-b border-slate-100 w-full text-right pr-2">₩{(yAxisMax * 0.75 / 10000).toLocaleString()}만</div>
+              <div className="border-b border-slate-100 w-full text-right pr-2">₩{(yAxisMax * 0.5 / 10000).toLocaleString()}만</div>
+              <div className="border-b border-slate-100 w-full text-right pr-2">₩{(yAxisMax * 0.25 / 10000).toLocaleString()}만</div>
             </div>
 
             {/* 실제 막대그래프 */}
             {dynamicMonthlyRevenue.map((item, idx) => {
-              // Y축 상한 대비 높이 비율 계산
               const heightPct = yAxisMax > 0 ? (item.revenue / yAxisMax) * 85 : 0; 
               return (
                 <div key={idx} className="flex-1 flex flex-col items-center justify-end h-full group z-10" id={`bar_${idx}`}>
                   {/* 말풍선 툴팁 */}
-                  <div className="opacity-0 group-hover:opacity-100 transition duration-200 absolute bottom-[72%] bg-gray-900 text-white rounded-lg px-3 py-1.5 text-xs font-semibold shadow-md pointer-events-none z-20 leading-normal text-center">
-                    <p className="font-bold text-emerald-400">{item.month} 매출</p>
-                    <p className="font-mono mt-0.5">₩{item.revenue.toLocaleString()} 원 ({item.activeContracts}건)</p>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute bottom-[72%] bg-slate-905 text-white rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xl pointer-events-none z-20 leading-normal text-center border border-white/10 backdrop-blur-md">
+                    <p className="font-black text-brand-green">{item.month} 매출</p>
+                    <p className="font-mono font-bold mt-0.5">₩{item.revenue.toLocaleString()} 원 ({item.activeContracts}건)</p>
                   </div>
                   
                   {/* 컬러 막대 */}
                   <div 
-                    style={{ height: `${heightPct > 0 ? heightPct : 3}%` }} // 데이터가 0원일 때도 최소 3% 높이로 시각선 보장
+                    style={{ height: `${heightPct > 0 ? heightPct : 3}%` }} 
                     className={`w-12 bg-gradient-to-t ${
                       item.revenue > 0 
-                        ? 'from-[#00529C] to-blue-400 hover:to-emerald-400' 
-                        : 'from-gray-200 to-gray-300'
-                    } rounded-t-lg transition-all duration-300 group-hover:shadow-sm`}
+                        ? 'from-brand-blue to-brand-blue-deep hover:from-brand-green hover:to-brand-green-deep' 
+                        : 'from-slate-200 to-slate-300'
+                    } rounded-t-xl transition-all duration-300 group-hover:shadow-sm cursor-pointer`}
                   />
                   
                   {/* 가로 축 라벨 */}
-                  <span className="text-xs font-bold text-gray-500 mt-2 font-sans">{item.month}</span>
+                  <span className="text-xs font-extrabold text-slate-500 mt-2 font-sans">{item.month}</span>
                 </div>
               );
             })}
           </div>
           
-          <div className="flex justify-center gap-6 text-[10.5px] text-gray-500 mt-2 font-medium">
+          <div className="flex justify-center gap-6 text-[10.5px] text-slate-455 mt-2 font-semibold">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 bg-gradient-to-t from-[#00529C] to-blue-400 rounded-md inline-block"></span>
+              <span className="w-3 h-3 bg-gradient-to-t from-brand-blue to-brand-blue-deep rounded-md inline-block"></span>
               <span>월별 실제 대부료 수익 집계액</span>
             </div>
           </div>
         </div>
 
         {/* 차트 2: Lease Status 구성비 */}
-        <div className="bg-[#003B73] rounded-3xl p-6 lg:col-span-4 text-white flex flex-col justify-between shadow-md" id="chart_lease_status_composition">
-          <div className="space-y-1">
-            <h3 className="font-sans font-bold text-base leading-tight">Lease Status (실시간 대부 용도 분포)</h3>
-            <p className="text-xs text-blue-100/80">현재 등록된 전체 가용자산의 용도별 비중</p>
+        <div className="bg-slate-905 border border-white/10 rounded-3xl p-6 lg:col-span-4 text-white flex flex-col justify-between shadow-2xl backdrop-blur-md relative overflow-hidden" id="chart_lease_status_composition">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="space-y-1 z-10">
+            <h3 className="font-sans font-black text-base leading-tight tracking-tight">Lease Status (실시간 대부 용도 분포)</h3>
+            <p className="text-xs text-brand-blue-light/70 font-medium">현재 등록된 전체 가용자산의 용도별 비중</p>
           </div>
 
-          <div className="my-6 space-y-4.5" id="stat_pie_representation">
+          <div className="my-6 space-y-4.5 z-10" id="stat_pie_representation">
             {leaseStatusStats.map((stat, idx) => (
               <div key={idx} className="space-y-1.5" id={`stat_bar_${idx}`}>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-white/95 flex items-center gap-1.5">
+                  <span className="font-extrabold text-white/90 flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: stat.color }} />
                     {stat.name}
                   </span>
-                  <span className="font-mono font-black text-[#fabd00]">{stat.value}%</span>
+                  <span className="font-mono font-black" style={{ color: stat.color }}>{stat.value}%</span>
                 </div>
                 {/* 진행 게이지바 */}
-                <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden shadow-inner">
                   <div 
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${stat.value}%`, backgroundColor: stat.color }}
@@ -288,25 +288,25 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
           {/* 실데이터 기반 지적 자산 엑셀 일괄 다운로드 엔진 연결 */}
           <button 
             onClick={handleDownloadExcel}
-            className="w-full bg-white text-[#003B73] hover:bg-gray-55 text-xs font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 mt-2 active:scale-98"
+            className="w-full bg-white hover:bg-slate-50 text-brand-blue-deep hover:text-brand-blue font-black py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 mt-2 active:scale-97 cursor-pointer text-xs"
             id="btn_download_full_report"
           >
-            <Download className="w-4 h-4 text-[#003B73]" />
+            <Download className="w-4 h-4" />
             실제 자산 DB 엑셀(.csv) 내려받기
           </button>
         </div>
       </div>
 
       {/* 📋 하단: 최근 대부 신청 및 심사 현황 */}
-      <div className="bg-white rounded-2xl border border-gray-150 shadow-xs p-5" id="recent_applications_card">
+      <div className="glass-card p-5 rounded-3xl" id="recent_applications_card">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-sans font-bold text-[#020617] text-base leading-tight">Recent Lease Applications (실제 대부 신청서 접수 현황)</h3>
-            <p className="text-xs text-gray-500">시민들이 랜드버디 모바일 비서를 통해 신청 접수한 실제 리스트</p>
+            <h3 className="font-sans font-black text-gray-950 text-base leading-tight tracking-tight">Recent Lease Applications (실제 대부 신청서 접수 현황)</h3>
+            <p className="text-xs text-gray-400 font-semibold mt-0.5">시민들이 랜드버디 모바일 비서를 통해 신청 접수한 실제 리스트</p>
           </div>
           <button 
             onClick={() => onGoToTab('assistant')}
-            className="text-xs font-bold text-[#00529C] hover:underline flex items-center gap-1"
+            className="text-xs font-black text-brand-blue hover:text-brand-blue-deep hover:underline flex items-center gap-1 cursor-pointer"
             id="btn_view_all_apps"
           >
             새로 신청하기 <ChevronRight className="w-4 h-4" />
@@ -314,45 +314,45 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
         </div>
 
         {/* 표 */}
-        <div className="overflow-x-auto border border-gray-150 rounded-xl max-h-[300px] overflow-y-auto" id="dashboard_table_scroll">
+        <div className="overflow-x-auto border border-slate-100 rounded-2xl max-h-[300px] overflow-y-auto" id="dashboard_table_scroll">
           <table className="w-full text-xs text-left" id="dashboard_applications_table">
-            <thead className="bg-[#f8f9fa] border-b border-gray-200 text-gray-700 uppercase tracking-wide">
+            <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase tracking-wide font-sans">
               <tr>
-                <th className="p-3.5 font-semibold">신청인 (Applicant)</th>
-                <th className="p-3.5 font-semibold">부지번호 (Parcel ID)</th>
-                <th className="p-3.5 font-semibold">사업 목적 (Type/Purpose)</th>
-                <th className="p-3.5 font-semibold">신청일자 (Date Applied)</th>
-                <th className="p-3.5 font-semibold text-center">진행 상태 (Status)</th>
-                <th className="p-3.5 font-semibold text-center">상세 검토 (Action)</th>
+                <th className="p-3.5 font-bold">신청인 (Applicant)</th>
+                <th className="p-3.5 font-bold">부지번호 (Parcel ID)</th>
+                <th className="p-3.5 font-bold">사업 목적 (Type/Purpose)</th>
+                <th className="p-3.5 font-bold">신청일자 (Date Applied)</th>
+                <th className="p-3.5 font-bold text-center">진행 상태 (Status)</th>
+                <th className="p-3.5 font-bold text-center">상세 검토 (Action)</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-100">
               {applications.length > 0 ? (
                 applications.map((app) => (
-                  <tr key={app.id} className="hover:bg-gray-50/50 transition duration-150 text-gray-700">
+                  <tr key={app.id} className="hover:bg-slate-55 transition-colors duration-150 text-gray-700">
                     <td className="p-3.5">
-                      <div className="font-bold text-gray-900">{app.applicantName}</div>
-                      <div className="text-[10px] text-gray-400 font-mono font-semibold">{app.entityType || '일반 시민'}</div>
+                      <div className="font-extrabold text-gray-900">{app.applicantName}</div>
+                      <div className="text-[10px] text-gray-400 font-mono font-bold">{app.entityType || '일반 시민'}</div>
                     </td>
-                    <td className="p-3.5 font-mono font-bold text-[#00529C]">
+                    <td className="p-3.5 font-mono font-black text-brand-blue">
                       {app.parcelId}
                     </td>
-                    <td className="p-3.5">
-                      <div className="font-semibold text-gray-800 truncate max-w-[200px]" title={app.purpose}>{app.purpose}</div>
-                      <div className="text-[10px] text-gray-400 truncate max-w-[200px]">{app.address}</div>
+                    <td className="p-3.5 font-medium text-gray-800">
+                      <div className="font-bold truncate max-w-[200px]" title={app.purpose}>{app.purpose}</div>
+                      <div className="text-[10px] text-gray-400 truncate max-w-[200px] font-semibold">{app.address}</div>
                     </td>
-                    <td className="p-3.5 font-mono text-gray-500">
+                    <td className="p-3.5 font-mono font-bold text-slate-500">
                       {app.appliedDate}
                     </td>
                     <td className="p-3.5 text-center">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold inline-block border ${
                         app.status === '승인' 
-                          ? 'bg-emerald-50 text-[#006e1c] border-emerald-200' 
+                          ? 'bg-brand-green-light text-brand-green-deep border-emerald-250' 
                           : app.status === '보완요청' 
-                          ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                          ? 'bg-amber-50 text-amber-800 border-amber-200' 
                           : app.status === '반려' 
-                          ? 'bg-red-50 text-red-600 border-red-200' 
-                          : 'bg-blue-50 text-blue-700 border-blue-200'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                          : 'bg-brand-blue-light text-brand-blue-deep border-brand-blue/15'
                       }`}>
                         {app.status === '승인' ? '심사승인' : app.status === '보완요청' ? '보완요청' : app.status === '반려' ? '심사반려' : '심사진행'}
                       </span>
@@ -360,7 +360,7 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
                     <td className="p-3.5 text-center">
                       <button 
                         onClick={() => onSelectApplication(app.id)}
-                        className="text-gray-400 hover:text-[#00529C] p-1.5 hover:bg-gray-100 rounded-lg transition"
+                        className="text-slate-400 hover:text-brand-blue p-2 hover:bg-slate-100 rounded-xl transition-all duration-205 active:scale-90"
                         title="상세내역 심사"
                         id={`btn_review_${app.id}`}
                       >
@@ -372,8 +372,8 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
               ) : (
                 <tr>
                   <td colSpan={6} className="p-10 text-center font-sans text-gray-400">
-                    <p className="font-bold text-[#00529C] text-sm mb-1">접수된 대부 계약 신청서가 없습니다</p>
-                    <p className="text-xs text-gray-500">시민용 모바일 앱 챗봇을 통해 가상 대부 신청을 하시면 이곳에 실시간 접수됩니다.</p>
+                    <p className="font-black text-brand-blue text-sm mb-1">접수된 대부 계약 신청서가 없습니다</p>
+                    <p className="text-xs text-gray-400 font-semibold">시민용 모바일 앱 챗봇을 통해 가상 대부 신청을 하시면 이곳에 실시간 접수됩니다.</p>
                   </td>
                 </tr>
               )}

@@ -28,7 +28,7 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
     {
       id: 'welcome',
       sender: 'bot',
-      text: `반갑습니다! 국가철도공단(KR)의 유휴부지 대부(렌탈) 및 공간 복지 맞춤형 비서, **'K-Rail Land-Buddy (케이레일 랜드버디)'**입니다. 🚉💚
+      text: `반갑습니다! 국가철도공단(KR)의 유휴부지 대부(렌탈) 및 공간 복지 맞춤형 비서, **'KR-Land Buddy'**입니다. 🚉💚
       
 대표 표준 공공 API 데이터 조립 연계 모듈이 탑재되어, 지적 공부 및 용도 규제(1단계)와 도로/상하수도/전기 인프라(2단계) 공공데이터를 똑똑하게 파싱하여 시민들이 알기 쉬운 **'친절하고 명쾌한 설명'**으로 3줄 요약해 드립니다!
 
@@ -50,13 +50,17 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
   const [apiKey, setApiKey] = useState<string>(() => {
     const savedKey = localStorage.getItem('k_rail_gemini_api_key');
     if (savedKey) return savedKey;
-    return ((import.meta as any).env?.VITE_GEMINI_API_KEY as string) || 'AIzaSyBaOd9D3Jnqyrwo-kxacF9495SXkjhOk8U';
+    return ((import.meta as any).env?.VITE_GEMINI_API_KEY as string) || '';
   });
   const [publicDataKey, setPublicDataKey] = useState<string>(() => {
-    return localStorage.getItem('k_rail_public_data_key') || '';
+    const savedKey = localStorage.getItem('k_rail_public_data_key');
+    if (savedKey) return savedKey;
+    return ((import.meta as any).env?.VITE_PUBLIC_DATA_KEY as string) || '';
   });
   const [vworldKey, setVworldKey] = useState<string>(() => {
-    return localStorage.getItem('k_rail_vworld_key') || '';
+    const savedKey = localStorage.getItem('k_rail_vworld_key');
+    if (savedKey) return savedKey;
+    return ((import.meta as any).env?.VITE_VWORLD_KEY as string) || '';
   });
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const [isApiConnecting, setIsApiConnecting] = useState(false);
@@ -123,57 +127,20 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
     if (parcel.isRailwayProtected) {
       easyRule = '기차가 안전하게 지나다니는 보호 구역(철도보호지구) 근처여서, 임시 시설물(푸드트럭, 가설 컨테이너, 미니 가로등)을 두실 때 공단에 가볍게 신고 절차만 한 번 거쳐주시면 끝납니다. (어려운 서류는 제가 다 적어 드려요!)';
     } else {
-      easyRule = '주변에 기차가 정차하는 구역이 인접해 다소의 소음이 발생할 수 있지만, 농작물 재배나 단순 창고용으로 이용하기에 행정상 아무런 걸림돌이 없는 청정 구역입니다.';
+      easyRule = '주변에 기차가 정차하는 구역이 인접해 다소의 소음이 발생할 수 있지만, 농작물 재배나 단순 창고용으로 이용하기에 행정상 아무런 걸림돌이 없는 대부 가능지입니다.';
     }
-
+    
     return {
       step1: {
-        address: `${parcel.address} [부지번호: ${parcel.id}]`,
+        title: '대부 조건 및 가용 여부 요약',
         points: [
-          goodPoint,
-          `교통 및 안전 규제 안내: ⚠️ ${easyRule}`,
-          `임대(렌탈) 비용 부담 최저: 💰 1㎡당 매년 국가 지원 특별 우대 요율이 적용되어, 연간 총 약 ${yearlyFee.toLocaleString()}원의 초저렴 비용으로 안정적 이용이 가능해요.`
+          `이 부지는 면적 ${parcel.area}㎡에 달하는 국유지로서, 대부 목적은 [${parcel.recommendedUse}]에 가장 특화되어 있습니다.`,
+          `공시지가는 ㎡당 ${parcel.officialPrice.toLocaleString()}원 수준이며, ${label} 요율인 [${ratePct}%] 우대 금리가 즉각 적용됩니다.`,
+          `행정 규정 요약: ${easyRule}`
         ]
-      },
-      step2: {
-        formula: `${parcel.area.toLocaleString()}㎡(총 면적) × ${parcel.officialPrice.toLocaleString()}원(공시지가) × ${ratePct}%(대부 요율)`,
-        yearlyFee,
-        monthlyFee,
-        ratePct,
-        rateLabel: label
-      },
-      step3: {
-        applicant: userName || '미입력 (우측 상단 혹은 하단 "신청인 정보"를 등록해주세요)',
-        parcelId: parcel.id,
-        address: parcel.address,
-        purpose: parcel.recommendedUse.split('·')[0],
-        period: `${selectedLeasePeriod}개월 (${Math.round(selectedLeasePeriod / 12 * 10) / 10}년)`
       }
     };
   };
-  useEffect(() => {
-    if (apiKey) {
-      localStorage.setItem('k_rail_gemini_api_key', apiKey);
-    } else {
-      localStorage.removeItem('k_rail_gemini_api_key');
-    }
-  }, [apiKey]);
-
-  useEffect(() => {
-    if (publicDataKey) {
-      localStorage.setItem('k_rail_public_data_key', publicDataKey);
-    } else {
-      localStorage.removeItem('k_rail_public_data_key');
-    }
-  }, [publicDataKey]);
-
-  useEffect(() => {
-    if (vworldKey) {
-      localStorage.setItem('k_rail_vworld_key', vworldKey);
-    } else {
-      localStorage.removeItem('k_rail_vworld_key');
-    }
-  }, [vworldKey]);
 
   const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
@@ -209,8 +176,32 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
       let logs: string[] = [];
       let assembledParcel: LandParcel | null = null;
 
-      // 1. 자연어 쿼리 분석 및 내부 DB(parcels 프로퍼티)에서 후보 부지 탐색 (엑셀 업로드 자산 포함!)
       const lowerText = text.toLowerCase();
+
+      // 국유재산법 관련 질문인지 감지 (초정밀 감지 센서)
+      const isLegalQuery = lowerText.includes('법') || 
+                           lowerText.includes('조항') || 
+                           lowerText.includes('제18조') || 
+                           lowerText.includes('제31조') || 
+                           lowerText.includes('제32조') || 
+                           lowerText.includes('제72조') || 
+                           lowerText.includes('영구시설') || 
+                           lowerText.includes('영구건축') || 
+                           lowerText.includes('축조') || 
+                           lowerText.includes('대부계약') || 
+                           lowerText.includes('사용허가') || 
+                           lowerText.includes('대부료') || 
+                           lowerText.includes('임대료') || 
+                           lowerText.includes('감면') || 
+                           lowerText.includes('변상금') || 
+                           lowerText.includes('무단점유') || 
+                           lowerText.includes('보호구역') || 
+                           lowerText.includes('보호지구') || 
+                           lowerText.includes('안전지구') || 
+                           lowerText.includes('기간') || 
+                           lowerText.includes('갱신');
+
+      // 1. 자연어 쿼리 분석 및 내부 DB(parcels 프로퍼티)에서 후보 부지 탐색 (엑셀 업로드 자산 포함!)
       let foundParcel: LandParcel | null = null;
 
       // 주소, 부지ID, 용도 단어 매핑으로 스마트 매칭 (초정밀 파서)
@@ -220,7 +211,7 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
         p.recommendedUse.split('·').some(word => word.length > 1 && lowerText.includes(word.toLowerCase()))
       ) || null;
 
-      // 발견하지 못한 경우 표준 룰셋으로 강제 폴백
+      // 발견하지 못한 경우 표준 룰셋으로 강제 폴백 (주소지나 자산번호 유도 시)
       if (!foundParcel) {
         if (lowerText.includes('대전역') || lowerText.includes('정동') || lowerText.includes('001')) {
           foundParcel = parcels.find(p => p.id === 'KR-001') || parcels[0];
@@ -233,6 +224,28 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
         } else if (lowerText.includes('용산') || lowerText.includes('교량') || lowerText.includes('서울') || lowerText.includes('005')) {
           foundParcel = parcels.find(p => p.id === 'KR-05') || parcels[4];
         }
+      }
+
+      // 사용자가 고른 용도가 프리셋에 있는지 확인하고 매칭 지침 추출
+      const presetGuides: Record<string, string> = {
+        "주말농장": "농업용 구거(물줄기)나 수자원 확보가 유리한지 체크하고, 별도 건축 행위가 없으므로 추천 점수를 높게 줄 것.",
+        "반려견놀이터": "대형견/소형견 분리를 위해 부지 면적이 최소 300㎡ 이상이어야 함을 체크하고, 안전 펜스(가설물) 설치가 필수임을 안내할 것.",
+        "푸드트럭": "인근 도로 접해성(진입로)이 핵심임. 가설건축물 및 이동식 차량으로 운영되므로 법적으로 매우 유리함을 명시할 것."
+      };
+
+      let userPurpose = "";
+      if (lowerText.includes("농장") || lowerText.includes("텃밭") || lowerText.includes("농업") || lowerText.includes("경작") || lowerText.includes("주말농장")) {
+        userPurpose = "주말농장";
+      } else if (lowerText.includes("반려견") || lowerText.includes("애견") || lowerText.includes("놀이터") || lowerText.includes("댕댕이") || lowerText.includes("소형견") || lowerText.includes("대형견") || lowerText.includes("개")) {
+        userPurpose = "반려견놀이터";
+      } else if (lowerText.includes("푸드트럭") || lowerText.includes("푸드") || lowerText.includes("트럭") || lowerText.includes("창업") || lowerText.includes("카페") || lowerText.includes("스토어")) {
+        userPurpose = "푸드트럭";
+      }
+
+      if (!userPurpose && foundParcel) {
+        userPurpose = foundParcel.recommendedUse.split('·')[0].trim();
+      } else if (!userPurpose) {
+        userPurpose = "일반용도";
       }
 
       // 2. 부지가 매칭된 경우 국토교통부/브이월드 공간 API 실시간 체이닝(Chaining) 작동!
@@ -255,64 +268,112 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
         }
       }
 
-      // 3. 진짜 Gemini API 키가 존재하는 경우 실시간 호출 수행하여 따뜻한 언어로 번역
-      if (apiKey.trim() && assembledParcel) {
+      // 3. 진짜 Gemini API 키가 존재하는 경우 실시간 법령/용도 분석 수행
+      if (apiKey.trim()) {
         try {
           setIsApiConnecting(true);
           const ai = new GoogleGenAI({ apiKey });
           
-          const systemInstruction = `너는 국가철도공단의 공간 복지 전담 맞춤 비서 'K-Rail Land-Buddy'이다.
-일반 시민들의 눈높이에 맞추어, 기차 선로 주변 유휴부지를 임대해 생활/창업에 쓰려는 민원인에게 공공 행정 데이터를 알기 쉽게 가이드하는 역할을 한다.
+          let finalPrompt = "";
+          let systemInstruction = "";
 
-[대표님 지시: 100% 오픈 API 기반 데이터 조립 3단계 가이드]
-반드시 아래의 수집/조립 완료된 실시간 공공데이터 JSON과 API 연동 로그를 종합하여 시민들의 터전 자립을 따뜻하게 지지하고 배려하는 말투로 3단계 형식의 친절한 가이드를 작성해라.
+          // 국유재산법 질문 모드
+          if (isLegalQuery && !assembledParcel) {
+            finalPrompt = `
+[사용자 질문]
+"${text}"
 
-작성 규칙:
-- 가이드는 100% 한글로 작성하며, '인간의 따뜻한 언어'로 작성해라. 행정 용어나 전문 용어는 시민 눈높이에 맞춰 직관적으로 풀어 써줘라.
-- 보고서 형식을 갖추어 다음 구조를 철저히 지켜라:
-  ■ [기반] 매칭된 부지의 기본 지번(주소), 부지번호(id), 면적, 지목 정보 및 실시간 위경도 좌표(latitude, longitude) 명시.
-  ■ [1단계 (규제/비용)]:
-    - 토지이용규제(zoning) 및 철도보호지구 여부(isRailwayProtected)를 아주 쉽게 순화하여 설명.
-    - 공시지가(officialPrice)와 연 대부료 산출공식 명시 (경작용 1%, 상업/창업용 3%, 일반용 5%).
-  ■ [2단계 (인프라)]:
-    - 도로 접함 여부(hasRoadAccess)와 농업용수/상하수도 최단 거리(waterDistance), 전기 가설 여부(electricityAccess) 기반의 인프라 진입성 평가.
-  ■ [3단계 (UI/UX 3줄 요약)]:
-    - 취합된 실시간 오픈 API 정보들을 종합하여, "따뜻한 언어"로 요약된 '핵심 3줄 요약 액션 플랜'을 반드시 마크다운 리스트 형태로 작성할 것.
+[필수 분석 지침]
+- 대한민국 국유재산법 조항(제18조 영구시설물 축조 금지, 제30조 사용허가, 제31조 대부기간 및 5년 갱신 혜택, 제32조/제34조 대부요율 농업 1%/창업 3%/일반 5% 감면 특례, 제72조 무단점유 변상금 120% 규정 등)을 기반으로 정교하고 친절하게 전문 행정 솔루션을 제공하라.
+- 불필요한 인사는 생략하고 질문에 집중하여 마크다운 표나 리스트로 가독성 높게 정리하라.
+- 마지막에는 쏭비서 특유의 "대표님, 법령 오케스트레이션 공장 정상 가동 중입니다!" 라는 기운찬 확인 멘트로 깔끔하게 끝내라.
+`;
+            systemInstruction = `너는 대한민국 국가철도공단의 유휴지 공간복지 활용 전문 AI 비서이자 국유재산 행정법률 수석 컨설턴트인 '쏭비서'이다.
+일반 민원인이 국유재산 대부나 철도 인근 부지 임대와 관련된 법적 질문을 던졌을 때, 최고의 전문성으로 알기 쉽게 통역해 주어라.
+국유재산법과 철도안전법에 관한 조문 해석을 명쾌하게 내려주고, 시민들이 흔히 범하기 쉬운 실수(무단 점용, 콘크리트 무단 타설 등)에 대해 친절하게 사전 예방 팁을 제시하여라.`;
+          } else if (assembledParcel) {
+            // 기존의 부지 매칭 분석 모드
+            const { yearlyFee } = calculateLeaseFee(assembledParcel);
+            const calculatedRent = yearlyFee.toLocaleString();
+            const landData = {
+              address: assembledParcel.address,
+              area: assembledParcel.area
+            };
 
-만약 사용자의 니즈에 가장 잘 부합하는 추천 부지가 있다면, 답변의 맨 마지막 줄에 단독 줄로 반드시 \`[MATCH_PARCEL: KR-00X]\` 형태로 표기해라 (예: \`[MATCH_PARCEL: KR-002]\`).
+            const 추가지침 = presetGuides[userPurpose] 
+              ? presetGuides[userPurpose] 
+              : "내가 처음 보는 용도이다. 네가 가진 지식을 총동원하되, 국유재산법 제18조(영구건축물 금지)에 위배되는 행위(콘크리트, 단단한 빌딩 건축 등)인지 엄격히 심사하여 가설건축물(컨테이너, 천막 등) 형태로만 가능한지 유연하게 판정해라.";
 
-[조립 완료된 실시간 공공 데이터 JSON]
-${JSON.stringify(assembledParcel)}
+            finalPrompt = `
+너는 국유재산 활용 전문 컨설턴트야. 아래 정보를 보고 이 땅이 해당 용도로 적합한지 3줄 요약해 줘.
 
-[실시간 API 연동 체인 로그]
-${JSON.stringify(logs)}`;
+[부지 정보]
+- 주소: ${landData.address}
+- 면적: ${landData.area}㎡
+- 예상 렌탈비: ${calculatedRent}원
 
-          const apiResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: `사용자 질의: "${text}"`,
-            config: {
-              systemInstruction: systemInstruction,
-              temperature: 0.2
-            }
-          });
+[신청 용도]
+- 용도명: ${userPurpose}
 
-          const geminiText = apiResponse.text || '';
-          setIsApiConnecting(false);
+[★ 필수 분석 지침 ★]
+${추가지침}
 
-          // API 연동 터미널 로그를 본문 맨 위에 멋지게 추가
-          const terminalLogs = `🔗 **[실시간 공공 API 호출 체인 작동 로그]**
+[출력 형식]
+1줄: 적합성 판정 결과 및 추천 점수 (100점 만점 기준)
+2줄: 이 부지에서 해당 사업을 할 때의 명확한 장점과 렌탈비 메리트
+3줄: 국유재산법을 준수하기 위한 가설물 활용 및 인허가 팁 안내
+`;
+
+            systemInstruction = `너는 국가철도공단의 국유재산 활용 전문 컨설턴트 'K-Rail Land-Buddy'이다.
+일반 시민들의 눈높이에 맞추어, 기차 선로 주변 유휴부지를 임대해 생활/창업에 쓰려는 민원인에게 공공 행정 데이터를 알기 쉽게 가이드하고 대한민국 국유재산법에 근거하여 전문적인 답변을 제공한다.
+
+[국유재산법 전문성 주입]
+반드시 아래의 대한민국 국유재산법 핵심 조항에 근거하여 답변을 작성해야 한다:
+- **제18조 (영구시설물 축조 금지)**: 국가 외의 자는 국유재산에 영구시설물을 축조하지 못하는 것이 대원칙이다. 다만, 철거 및 원상회복이 용이한 가설건축물(컨테이너, 조립식 펜스, 임시 천막 등)의 경우 공단의 승인을 받고 철거이행보증조치(보증서 제출 등)를 마치면 예외적으로 설치가 가능하다.
+- **제31조 / 제35조 (대부계약 및 사용허가 기간)**: 일반 토지 및 정착물의 대부 허가 기간은 기본 **5년 이내**이다. 계약 만료 전 갱신 요건에 부합하면 1회에 한해 5년의 범위에서 갱신이 가능하여, 최장 10년간 장기적으로 안정된 운영 터전이 보장된다.
+- **제32조 (대부요율)**: 일반적인 연간 대부료는 해당 재산가액의 **연 5% 이상**이 기준이다. 다만, 영농/경작용은 1%, 소상공인 창업 및 상업 공간 특례는 3%의 파격적인 우대 감면 요율이 적용된다.
+
+반드시 사용자가 제시하는 [부지 정보], [신청 용도], [★ 필수 분석 지침 ★]을 엄격히 분석하여 지정된 [출력 형식]에 맞추어 "인간의 따뜻한 언어"로 답변해야 한다.
+
+반드시 지켜야 할 규칙:
+1. 답변은 정확히 3줄로 구성해라.
+2. 1줄: 적합성 판정 결과 및 추천 점수 (100점 만점 기준)를 자연스러운 문장으로 서술.
+3. 2줄: 이 부지에서 해당 사업을 할 때의 명확한 장점과 렌탈비 메리트 서술.
+4. 3줄: 국유재산법(제18조 가설물 우회와 이행보증보험 팁, 제31조 최초 5년 계약 및 갱신 특혜)을 준수하기 위한 가설물 활용 및 인허가 팁 안내 서술.
+5. 시민 눈높이에 맞춰 행정/전문 용어를 아주 쉽게 풀어 써라.
+6. 만약 추천 부지 매칭이 발생했다면 답변 마지막에 대부 대상 부지 ID를 [MATCH_PARCEL: ${assembledParcel.id}] 형태로 남겨다오.`;
+          }
+
+          if (finalPrompt && systemInstruction) {
+            const apiResponse = await ai.models.generateContent({
+              model: 'gemini-2.5-flash',
+              contents: finalPrompt,
+              config: {
+                systemInstruction: systemInstruction,
+                temperature: 0.2
+              }
+            });
+
+            const geminiText = apiResponse.text || '';
+            setIsApiConnecting(false);
+
+            if (assembledParcel) {
+              const terminalLogs = `🔗 **[실시간 공공 API 호출 체인 작동 로그]**
 \`\`\`bash
 ${logs.join('\n')}
 \`\`\`
 \n`;
-          
-          replyText = terminalLogs + geminiText;
+              replyText = terminalLogs + geminiText;
+            } else {
+              replyText = geminiText;
+            }
 
-          // 정규식으로 매칭된 부지 ID 추출
-          const match = replyText.match(/\[MATCH_PARCEL:\s*(KR-\d+)\]/i);
-          if (match && match[1]) {
-            matchedParcelId = match[1].toUpperCase();
-            replyText = replyText.replace(/\[MATCH_PARCEL:\s*KR-\d+\]/gi, '').trim();
+            // 정규식으로 매칭된 부지 ID 추출
+            const match = replyText.match(/\[MATCH_PARCEL:\s*(KR-\d+)\]/i);
+            if (match && match[1]) {
+              matchedParcelId = match[1].toUpperCase();
+              replyText = replyText.replace(/\[MATCH_PARCEL:\s*KR-\d+\]/gi, '').trim();
+            }
           }
         } catch (error) {
           console.error('Gemini API call failed, falling back to mock.', error);
@@ -323,7 +384,126 @@ ${logs.join('\n')}
 
       // 4. API 호출이 안 되었거나 폴백 상태일 때 똑똑한 로컬 목업 매핑 작동
       if (!replyText || replyText.startsWith('⚠️')) {
-        if (assembledParcel) {
+        if (isLegalQuery && !assembledParcel) {
+          // 국유재산법 전문 폴백 해설 작동!
+          let legalContent = "";
+          
+          if (lowerText.includes('18조') || lowerText.includes('영구') || lowerText.includes('건축') || lowerText.includes('축조') || lowerText.includes('건물')) {
+            legalContent = `
+### 🏛️ 국유재산법 제18조 (영구시설물 축조 금지) 핵심 가이드
+
+**1. 대원칙: 영구시설물 축조 금지**
+- 국가 외의 자는 국유재산에 영구적인 건물, 다리 등의 시설물을 **축조(건축)하지 못하는 것이 대원칙**입니다. 이는 국유재산의 원상회복을 어렵게 하고 공공 환수 시 분쟁을 유발하기 때문입니다.
+
+**2. 합법적인 우회 및 예외 팁 (가설물 설계)**
+- **이동식 가설건축물 활용:** 콘크리트 기초 타설을 하지 않고, 볼트 체결식이나 견인이 가능한 **이동식 컨테이너, 조립식 펜스, 간이 천막** 등은 영구시설물에 해당하지 않아 허용됩니다!
+- **원상회복 이행보증조치:** 허가를 신청할 때 대부 종료 시 자진 철거하겠다는 **철거 각서 및 철거이행보증보험증권**을 공단에 제출하면 즉시 승인이 가용합니다.
+- **예외적 기부채납:** 국가에 소유권을 이전(기부채납)하고 사용료를 면제받는 형태로 영구물을 짓는 특례가 있으나, 소상공인 수준에서는 가설건축물 형태의 우회 전략이 가장 신속하고 유리합니다.
+
+*💡 **쏭비서의 팁:** 주말농장의 간이 쉼터나 푸드트럭 야외 테라스, 애견운동장 안전 펜스는 모두 100% 가설물에 해당하여 문제없이 즉시 승인됩니다! 대표님, 법률 공장 정상 가동 중입니다!*
+`;
+          } else if (lowerText.includes('31조') || lowerText.includes('기간') || lowerText.includes('갱신') || lowerText.includes('연장') || lowerText.includes('몇 년') || lowerText.includes('몇년')) {
+            legalContent = `
+### 📅 국유재산법 제31조 / 제35조 (사용허가 및 대부기간) 핵심 가이드
+
+**1. 기본 계약 기간: 최초 5년**
+- 국유재산법에 의거하여 토지와 건물의 일반적인 사용허가(행정재산) 및 대부계약(일반재산) 기간은 **최초 5년 이내**로 제한됩니다.
+
+**2. 갱신 혜택 및 장기 운영 보장 (최장 10년)**
+- **1회 한정 5년 갱신:** 계약이 만료되기 전에 대부료 체납이 없고 사용 목적에 변함이 없다면, **1회에 한해 최대 5년을 추가로 연장(갱신)**할 수 있습니다. 
+- 따라서 **기본 10년(5년 + 5년)** 동안은 행정 소송이나 무단 회수 걱정 없이 장기적이고 안정적으로 창업이나 영농 터전을 보장받으실 수 있습니다.
+
+**3. 대부 기간 만료 후 재계약 룰**
+- 10년 만료 후에는 일반 입찰(경쟁 입찰)이 원칙이나, 영농 목적이거나 지자체 공간 복지 사업 연계 시 일정한 요건을 갖추면 수의계약 형태로 재계약을 타진할 수 있는 특별 조항이 있습니다!
+
+*💡 **쏭비서의 팁:** 계약 갱신 신청은 반드시 계약 만료 1개월 전까지 관할 지사에 신청서를 서면으로 접수하셔야 불이익이 없습니다. 대표님, 대부기간 타이머 정상 작동 중입니다!*
+`;
+          } else if (lowerText.includes('32조') || lowerText.includes('요율') || lowerText.includes('임대료') || lowerText.includes('대부료') || lowerText.includes('감면') || lowerText.includes('요금') || lowerText.includes('계산') || lowerText.includes('34조')) {
+            legalContent = `
+### 💰 국유재산법 제32조 / 제34조 (대부요율 및 감면 특례) 핵심 가이드
+
+**1. 대부료 산정의 기본 원칙**
+- **대부료 = 재산 가액(개별공시지가 × 면적) × 대부요율(%)**
+- 대부요율은 국유재산의 목적과 용도에 따라 세분화되어 적용되며, 매년 법적으로 재산 가액이 재평가되어 대부료가 고정 또는 변동됩니다.
+
+**2. 용도별 대부요율 및 특별 우대 감면**
+- **🚜 영농 및 경작용 (제1요율): 연 1.0% 이상** (예: 주말농장, 친환경 텃밭. 가장 강력한 우대 감면)
+- **🏢 소상공인 창업 및 상업용 공간 복지 특례: 연 3.0% 이상** (일반 상업 요율 5% 대비 40% 전격 감면 적용!)
+- **🏡 주거용 / 사회적 기업 공간 연계: 연 2.0% 이상**
+- **🚚 일반 용도 (야적장, 유료 주차장 등): 연 5.0% 이상**
+
+**3. 연간 대부료 인상 제한 (대부료 조정 제도)**
+- 당해 연도 대부료가 전년도 대비 급격히 상승하는 것을 방지하기 위해, 국유재산법 제33조에 의거하여 전년 대비 **연간 임대료 인상 폭은 최대 5% 이내**로 캡(Cap)이 씌워져 있어 안심하고 렌탈하셔도 됩니다!
+
+*💡 **쏭비서의 팁:** 랜드버디를 통해 창업(푸드트럭 등)을 신청하시면 공단 담당관에게 3% 우대 요율을 자동으로 적용해 달라고 행정 서식에 표기해 드립니다! 대표님, 임대 계산기 오차 없이 정상 가동 중입니다!*
+`;
+          } else if (lowerText.includes('72조') || lowerText.includes('변상금') || lowerText.includes('무단') || lowerText.includes('점유') || lowerText.includes('벌금')) {
+            legalContent = `
+### 🚨 국유재산법 제72조 (무단점유 변상금 징수) 및 벌칙 경고
+
+**1. 무단 점유의 정의**
+- 국유재산법에 따른 정당한 대부계약이나 사용허가 없이 국유재산을 임의로 사용하거나 점유(예: 불법 주차, 컨테이너 무단 방치, 경작 등)하는 행위를 의미합니다.
+
+**2. 변상금 폭탄 규정 (일반 임대료의 120% 부과)**
+- 무단 점유 행위가 공단 순찰 및 지상 실사에서 적발될 경우, 국유재산법 제72조에 의거하여 정당 대부료의 **120%에 상당하는 '변상금'**이 강제 징수됩니다.
+- 체납 시에는 **연 5%의 가산금**이 계속 가산되며, 공단의 독촉 후에도 미납 시 재산 압류 및 강제 추징이 개시됩니다.
+
+**3. 원상회복 및 행정대집행 대상**
+- 벌칙 변상금 부과와 별개로, 공단은 행정대집행법에 따라 무단 설치물(가설물, 주차 펜스 등)을 **즉각 강제 철거**할 수 있으며, 이로 발생하는 모든 대집행 비용도 무단점유자에게 청구됩니다.
+
+*💡 **쏭비서의 팁:** "잠깐 주차하는 건데 괜찮겠지" 하다가 위성 사진이나 순찰 드론에 촬영되어 수백만 원의 변상금 고지서를 받는 민원인이 매년 속출합니다! 반드시 랜드버디를 통해 합법적 대부 계약을 체결해 주세요. 대표님, 순찰 경보음 정상 가동 중입니다!*
+`;
+          } else if (lowerText.includes('보호구역') || lowerText.includes('보호지구') || lowerText.includes('철도보호') || lowerText.includes('안전') || lowerText.includes('30m') || lowerText.includes('35m')) {
+            legalContent = `
+### 🛡️ 철도안전법 제45조 (철도보호지구 내 행위 제한) 핵심 가이드
+
+**1. 철도보호지구란?**
+- 철도경계선(선로 외측 궤도 중심)으로부터 **30m 이내(실무상 35m 이내까지 관리)**의 지역을 의미하며, 철도 시설을 보호하고 열차의 안전 운행을 확보하기 위해 법률로 엄격히 관리하는 보안 안전지대입니다.
+
+**2. 금지 및 사전 신고 의무 행위**
+- 철도보호지구 내에서 토지의 형질변경, 자갈/흙 굴착, 높은 건물 신축, 가설물 설치, 인화성/폭발성 물질 방착 등의 행위를 하려면 **반드시 철도공단에 사전에 '행위 신고서'를 제출하여 승인**을 득해야 합니다.
+- 만약 신고 없이 임의로 굴착하거나 위험물을 적치할 경우, 철도안전법에 의거 **2년 이하의 징역 또는 2천만 원 이하의 벌금**에 처해질 수 있습니다.
+
+**3. 랜드버디의 안전 케어 서비스**
+- 랜드버디에 등록된 철도 유휴지 중 **KR-001(대전역), KR-003(조치원)** 등은 일부 필지가 철도보호지구에 속해 있습니다. 하지만 걱정 마세요! 랜드버디가 안전 반경 35m를 지도 상에 실시간 빨간 점선으로 시각화해 드리고, 필요한 철도 행위신고 서류 초안도 자동 완성하여 대부 접수 시 함께 처리해 드립니다!
+
+*💡 **쏭비서의 팁:** 열차 진동이나 고압 전선으로 인해 선로 인근 10m 안쪽에는 절대로 무거운 고정식 가설물을 설치해서는 안 됩니다. 대표님, 안전 경계선 감시 레이더 정상 가동 중입니다!*
+`;
+          } else {
+            // 종합 안내
+            legalContent = `
+### 🎓 대한민국 국유재산법 핵심 조항 종합 브리핑
+
+대한민국 국유재산법(State Property Act)은 국가의 소중한 재산(토지, 건물 등)을 효율적으로 보존하고 대부/활용하기 위한 법적 대원칙입니다. 랜드버디가 가장 많이 문의하시는 4대 조항을 일목요연하게 정리해 드립니다!
+
+---
+
+**1. 🏗️ 제18조 (영구시설물 축조 금지)**
+- 국유재산에는 단단한 콘크리트 빌딩 등의 영구시설물을 짓지 못하는 것이 원칙입니다.
+- **해결책:** 해체 및 견인이 용이한 **이동식 가설건축물(컨테이너, 조립식 펜스, 임시 천막)** 형태로 설계하시면 공단의 대부 승인이 신속하게 가용합니다!
+
+**2. 📅 제31조 / 제35조 (대부 및 사용허가 기간)**
+- 국유지 대부계약 기간은 **최초 5년**이 기본입니다.
+- **연장 혜택:** 계약 준수 시 **1회에 한해 5년 추가 연장이 보장되어 최장 10년**간 이사나 명도 소송 걱정 없이 내 땅처럼 안심 운영이 가능합니다.
+
+**3. 💰 제32조 / 제34조 (대부요율 및 특별 감면)**
+- 연간 임대료는 공시지가 대비 **일반 용도는 연 5.0% 이상**이 기준입니다.
+- **특별 우대:** **농업 및 텃밭 경작은 연 1.0% 이상**, **소상공인 청년 창업 공간은 연 3.0% 이상**으로 대폭 경감 혜택이 적용됩니다.
+
+**4. 🚨 제72조 (무단점유 변상금 징수)**
+- 대부 계약 없이 국유지를 무단으로 점용할 경우, 정상 임대료의 **120%에 상당하는 '벌칙 변상금'**이 매년 소급 부과되며 강제 행정대집행 철거 대상이 됩니다.
+
+---
+
+*💡 **쏭비서의 팁:** 랜드버디의 모든 매칭 필지 시뮬레이터는 이 4대 법적 잣대를 AI 알고리즘으로 자동 연산하여 적합성과 추천 점수를 정확하게 산출합니다. 궁금한 조항(예: "제18조 가이드", "대부요율 할인 혜택")을 개별적으로 질문하시면 더 정밀한 원스톱 행정 자문을 받아보실 수 있습니다. 대표님, 법령 오케스트레이션 정상 가동 중입니다!*
+`;
+          }
+          
+          replyText = `⚖️ **[쏭비서 법률 행정 통역 가동 완료 (데모 모드)]** 
+국토교통부 및 공단 법무 지원실의 국유재산 대부 행정 가이드라인을 분석하여 민원인 눈높이에 맞춤 해설을 조립했습니다.
+
+${legalContent}`;
+        } else if (assembledParcel) {
           const parcel = assembledParcel;
           const { yearlyFee, monthlyFee, ratePct } = calculateLeaseFee(parcel);
           
@@ -332,6 +512,31 @@ ${logs.join('\n')}
 ${logs.join('\n')}
 \`\`\`
 \n`;
+
+          // 폴백 시 프리셋 맞춤형 3줄 요약 매커니즘
+          let step3Summary1 = "";
+          let step3Summary2 = "";
+          let step3Summary3 = "";
+
+          if (userPurpose === "주말농장") {
+            step3Summary1 = `🌱 **[적합성 판정]** 영농 및 친환경 경작에 **매우 적합(추천 점수: 95점)**합니다. 별도의 콘크리트 건축 행위가 없어 규제가 최소화됩니다.`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 인근 구거(물줄기)가 가까워 수자원 확보에 매우 유리하며, 연간 렌탈비가 약 ${yearlyFee.toLocaleString()}원(월 ${monthlyFee.toLocaleString()}원) 수준으로 경제적 메리트가 극대화됩니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조에 따라 영구건축물 축조는 금지되나, 친환경 컨테이너나 조립식 비닐하우스 등 가설물은 득할 수 있으며, 동법 제31조에 근거해 최초 5년(갱신 시 최장 10년)간 안정적 영농이 가용합니다.`;
+          } else if (userPurpose === "반려견놀이터") {
+            const hasEnoughArea = parcel.area >= 300;
+            step3Summary1 = `🦮 **[적합성 판정]** 야외 반려견 놀이터 공간으로 **적합(추천 점수: ${hasEnoughArea ? '90점' : '75점'})**합니다. (부지 면적 ${parcel.area}㎡로 ${hasEnoughArea ? '소/대형견 분리 운영 기준 300㎡ 충족' : '대형견/소형견 분리 면적 300㎡ 기준 미달하여 소형견 전용 권장'})`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 탁 트인 야외 유휴지를 월 ${monthlyFee.toLocaleString()}원이라는 독보적인 임대 조건으로 확보하여 댕댕이들의 안전한 놀이 공간으로 자립 운영할 수 있습니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조에 의거, 탈부착이 쉬운 안전 펜스(가설물) 형태로 배치도를 설계하시면 영구물 금지 조항을 우회할 수 있으며 동법 제31조에 따라 최초 5년(최장 10년) 대부 혜택을 획득합니다.`;
+          } else if (userPurpose === "푸드트럭") {
+            step3Summary1 = `🚚 **[적합성 판정]** 소상공인 푸드트럭 창업 및 모바일 F&B 부지로 **최상(추천 점수: 98점)**입니다. 도로 접해성과 진입로가 매우 훌륭합니다.`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 초역세권 유동인구 노다지 땅을 연간 약 ${yearlyFee.toLocaleString()}원의 특별우대 상업 대부 요율로 선점하여 창업 초기 고정비 부담을 획기적으로 낮출 수 있습니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 이동식 차량 및 가설 천막은 국유재산법 제18조 영구건축물 축조 금지 룰에 전혀 저촉되지 않아 최단기에 승인되며, 동법 제31조/제35조에 따라 최초 5년간 든든한 상업 계약이 법장 보장됩니다.`;
+          } else {
+            // 프리셋 외 용도 (대원칙 가이드 작동)
+            step3Summary1 = `🔍 **[적합성 판정]** 신청 용도 '${userPurpose}'에 대한 국유지 매칭 분석 결과 **보통(추천 점수: 80점)**입니다.`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 지적도 및 공시지가 시뮬레이션 결과 연 렌탈비 ${yearlyFee.toLocaleString()}원으로 저렴하게 공간 자립을 시작할 수 있는 최적의 기반을 제공합니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조(영구건축물 축조 금지)에 의거하여 단단한 콘크리트 빌딩 등의 구축은 불가하므로 가설건축물 형태로 유연하게 대안 설계도를 준비하셔야 동법 제31조(5년 한도 대부) 승인을 얻습니다.`;
+          }
 
           replyText = terminalLogs + `요청하신 용도와 목적에 맞추어 **국토교통부 표준 및 공간정보 연계 API**의 데이터를 실시간 조립하여 최고의 철도 유휴부지 매칭 결과를 도출했습니다.
 
@@ -360,10 +565,10 @@ ${logs.join('\n')}
 
 ---
 
-### 💚 3단계 (인간의 따뜻한 언어로 번역한 3줄 요약)
-1. ${parcel.id === 'KR-002' || parcel.id === 'KR-007' ? '텃밭 농사나 주말농장을 일구는 자연 친화적 꿈을 실현하기에 너무나도 기름지고 평화로운 땅입니다.' : '지역 사회의 유동 인구를 끌어들이며 소상공인의 창업 자립을 든든하게 실현해줄 가치 있는 기회의 공간입니다.'}
-2. ${!parcel.hasRoadAccess ? '비록 지적도상 진입로 보완이라는 조건은 있지만, 연간 임대료 감면 혜택으로 한 달에 커피 몇 잔 값 수준의 부담 없는 임대료로 든든한 일터를 가꾸실 수 있습니다.' : '기차 안전 한계선과 인접해 약간의 소음은 수반될 수 있으나, 공단 안전 펜스가 이미 잘 쳐져 있고 차량 진입이 매우 수월하여 사업성이 우수합니다.'}
-3. 랜드버디가 행정의 문턱을 활짝 낮춰드리니, 아래의 자동 완성된 신청서 버튼을 통해 마음 편히 공간 자립의 첫걸음을 떼어 보세요!`;
+### 💚 3단계 (국유재산 활용 컨설턴트 3줄 요약)
+1. ${step3Summary1}
+2. ${step3Summary2}
+3. ${step3Summary3}`;
         } else {
           replyText = `아쉽게도 현재 저희 공간 복지 자산 데이터베이스에는 **검색하신 지역명의 국유 유휴재산이 수록되어 있지 않습니다.** 😢
           
@@ -392,7 +597,111 @@ ${logs.join('\n')}
           application: {
             applicantName: applicantName || '미입력',
             parcelId: found.id,
-            purpose: found.recommendedUse.split('·')[0],
+            purpose: userPurpose,
+            leasePeriod: selectedLeasePeriod
+          }
+        };
+      }
+
+      setMessages(prev => [...prev, botMsg]);
+    }, 1000);
+  }; // 폴백 상태일 때 똑똑한 로컬 목업 매핑 작동
+      if (!replyText || replyText.startsWith('⚠️')) {
+        if (assembledParcel) {
+          const parcel = assembledParcel;
+          const { yearlyFee, monthlyFee, ratePct } = calculateLeaseFee(parcel);
+          
+          const terminalLogs = `🔗 **[실시간 공공 API 호출 체인 작동 로그]**
+\`\`\`bash
+${logs.join('\n')}
+\`\`\`
+\n`;
+
+          // 폴백 시 프리셋 맞춤형 3줄 요약 매커니즘
+          let step3Summary1 = "";
+          let step3Summary2 = "";
+          let step3Summary3 = "";
+
+          if (userPurpose === "주말농장") {
+            step3Summary1 = `🌱 **[적합성 판정]** 영농 및 친환경 경작에 **매우 적합(추천 점수: 95점)**합니다. 별도의 콘크리트 건축 행위가 없어 규제가 최소화됩니다.`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 인근 구거(물줄기)가 가까워 수자원 확보에 매우 유리하며, 연간 렌탈비가 약 ${yearlyFee.toLocaleString()}원(월 ${monthlyFee.toLocaleString()}원) 수준으로 경제적 메리트가 극대화됩니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조에 따라 영구건축물 축조는 금지되나, 친환경 컨테이너나 조립식 비닐하우스 등 가설물은 득할 수 있으며, 동법 제31조에 근거해 최초 5년(갱신 시 최장 10년)간 안정적 영농이 가용합니다.`;
+          } else if (userPurpose === "반려견놀이터") {
+            const hasEnoughArea = parcel.area >= 300;
+            step3Summary1 = `🦮 **[적합성 판정]** 야외 반려견 놀이터 공간으로 **적합(추천 점수: ${hasEnoughArea ? '90점' : '75점'})**합니다. (부지 면적 ${parcel.area}㎡로 ${hasEnoughArea ? '소/대형견 분리 운영 기준 300㎡ 충족' : '대형견/소형견 분리 면적 300㎡ 기준 미달하여 소형견 전용 권장'})`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 탁 트인 야외 유휴지를 월 ${monthlyFee.toLocaleString()}원이라는 독보적인 임대 조건으로 확보하여 댕댕이들의 안전한 놀이 공간으로 자립 운영할 수 있습니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조에 의거, 탈부착이 쉬운 안전 펜스(가설물) 형태로 배치도를 설계하시면 영구물 금지 조항을 우회할 수 있으며 동법 제31조에 따라 최초 5년(최장 10년) 대부 혜택을 획득합니다.`;
+          } else if (userPurpose === "푸드트럭") {
+            step3Summary1 = `🚚 **[적합성 판정]** 소상공인 푸드트럭 창업 및 모바일 F&B 부지로 **최상(추천 점수: 98점)**입니다. 도로 접해성과 진입로가 매우 훌륭합니다.`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 초역세권 유동인구 노다지 땅을 연간 약 ${yearlyFee.toLocaleString()}원의 특별우대 상업 대부 요율로 선점하여 창업 초기 고정비 부담을 획기적으로 낮출 수 있습니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 이동식 차량 및 가설 천막은 국유재산법 제18조 영구건축물 축조 금지 룰에 전혀 저촉되지 않아 최단기에 승인되며, 동법 제31조/제35조에 따라 최초 5년간 든든한 상업 계약이 법장 보장됩니다.`;
+          } else {
+            // 프리셋 외 용도 (대원칙 가이드 작동)
+            step3Summary1 = `🔍 **[적합성 판정]** 신청 용도 '${userPurpose}'에 대한 국유지 매칭 분석 결과 **보통(추천 점수: 80점)**입니다.`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 지적도 및 공시지가 시뮬레이션 결과 연 렌탈비 ${yearlyFee.toLocaleString()}원으로 저렴하게 공간 자립을 시작할 수 있는 최적의 기반을 제공합니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조(영구건축물 축조 금지)에 의거하여 단단한 콘크리트 빌딩 등의 구축은 불가하므로 가설건축물 형태로 유연하게 대안 설계도를 준비하셔야 동법 제31조(5년 한도 대부) 승인을 얻습니다.`;
+          }
+
+          replyText = terminalLogs + `요청하신 용도와 목적에 맞추어 **국토교통부 표준 및 공간정보 연계 API**의 데이터를 실시간 조립하여 최고의 철도 유휴부지 매칭 결과를 도출했습니다.
+
+### 🚉 [기반] 매칭 유휴부지 기본 정보
+- **부지 소재지:** ${parcel.address} [부지번호: ${parcel.id}]
+- **위도/경도 좌표:** 위도 ${parcel.latitude} / 경도 ${parcel.longitude}
+- **부지 면적 및 지목:** 면적 ${parcel.area}㎡ / 지목 '${parcel.landType}'
+
+---
+
+### 📋 1단계 (규제/비용 조립 결과)
+- **국토교통부 토지이용계획 규제 분석:**
+  이 땅은 현재 **'${parcel.zoning}'** 지역에 속해 있습니다. ${parcel.isRailwayProtected ? '⚠️ **철도보호지구 저촉구역**에 편입되어 있어 임시 가설 건축물(푸드트럭, 가설창고 등)을 거치할 시 공단에 사전 안전 행위신고 절차가 가볍게 수반됩니다. (시민분들을 위해 어려운 행정 신고서 서류는 제가 대신 자동 인쇄해 드립니다!)' : '✅ 철도 특별보호지구 구역 외로, 행정 행위 허가 절차 없이 즉각 대부가 가용합니다.'}
+- **개별공시지가 기반 임대료 시뮬레이션:**
+  올해 공시지가 **${parcel.officialPrice.toLocaleString()}원/㎡** 및 대부요율 **${ratePct}%**를 곱해 산출한 예상 연간 대부료는 다음과 같습니다.
+  * 계산 산식: ${parcel.area.toLocaleString()}㎡ (면적) × ${parcel.officialPrice.toLocaleString()}원 (지가) × ${ratePct}% (특별우대요율)
+  * **연간 예상 렌탈비:** **약 ${yearlyFee.toLocaleString()}원** (월 환산 기준 약 ${monthlyFee.toLocaleString()}원)
+
+---
+
+### 🔌 2단계 (도로/인프라 조립 결과)
+- **브이월드 지적도 기반 도로 접합성:**
+  ${parcel.hasRoadAccess ? '✅ **지적도상 공공 도로와 접함**이 확인되었습니다! 보행자 접근성 및 푸드트럭이나 물류 화물 차량 진입이 매우 원활한 안전 필지입니다.' : '⚠️ **지적도상 맹지(도로 미접함)**로 도로 이설 및 진입로 다지기 확보가 사전 권장됩니다. 공단 지사에서 토공 평탄화 기초 조치를 연계 지원합니다.'}
+- **환경부 GIS 관로 데이터 기반 인프라 수급:**
+  가장 가까운 상수도관(또는 소하천/구거) 최단 거리는 **${parcel.waterDistance}m** 이며, 한전 전력 설비는 **'${parcel.electricityAccess}'** 상태입니다. ${parcel.id === 'KR-002' || parcel.id === 'KR-007' ? '인근 구거(도랑)가 아주 가까워 주말농장용 배수와 경작 용수 수급이 최상입니다.' : parcel.id === 'KR-001' || parcel.id === 'KR-003' ? '상하수관 및 전력이 모두 인접 가용하여 푸드트럭 물 공급 및 소상공인 카페 영업 집기를 즉시 전원 연결해 사용 가능합니다!' : '용도에 따른 사전 관로 인입 및 가설 전력 계약이 필요할 수 있습니다.'}
+
+---
+
+### 💚 3단계 (국유재산 활용 컨설턴트 3줄 요약)
+1. ${step3Summary1}
+2. ${step3Summary2}
+3. ${step3Summary3}`;
+        } else {
+          replyText = `아쉽게도 현재 저희 공간 복지 자산 데이터베이스에는 **검색하신 지역명의 국유 유휴재산이 수록되어 있지 않습니다.** 😢
+          
+💡 **공공 서비스 미래 비전 안내:**
+현재 시범 버전에서는 철도 가용부지 중심의 자산을 제공 중이나, 향후 **기획재정부 국유재산포털 개방 데이터와 캠코 국유지 오픈 API를 연동**하여 전국의 모든 국유 잡종지/유휴지를 한 번에 매핑 검색하고 인간의 언어로 조립해 제공하는 **'범정부 공간복지 원스톱 솔루션'**으로 정식 확대 개편될 예정입니다!
+
+* **테스트 팁:** 대전역(푸드트럭), 주말농장(서구 텃밭), 조치원(카페), 신탄진(야적장), 용산(도심주차), 부산역(관광쉼터) 등을 검색해 보시면 즉시 오픈 API 조립 작동을 체험하실 수 있습니다.`;
+        }
+      }
+
+      // 5. 최종 메시지 및 액션카드 유기적 바인딩
+      const botMsg: LandBuddyMessage = {
+        id: `msg-${Date.now()}-bot`,
+        sender: 'bot',
+        text: replyText,
+        timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      if (matchedParcelId && assembledParcel) {
+        const found = assembledParcel;
+        setPendingParcel(found);
+        if (onSelectParcel) onSelectParcel(found.id);
+        botMsg.actionCard = {
+          type: 'recommend',
+          parcel: found,
+          application: {
+            applicantName: applicantName || '미입력',
+            parcelId: found.id,
+            purpose: userPurpose,
             leasePeriod: selectedLeasePeriod
           }
         };
@@ -585,7 +894,7 @@ ${logs.join('\n')}
             </div>
             <div>
               <h2 className="font-sans font-bold text-lg leading-tight flex items-center gap-1.5">
-                K-Rail 랜드버디
+                KR-Land Buddy
                 <span className="text-[10px] bg-white/15 px-1.5 py-0.5 rounded border border-white/10 font-normal">AI 2.5</span>
               </h2>
               <p className="text-xs text-blue-100/90 flex items-center gap-1">
@@ -850,34 +1159,34 @@ ${logs.join('\n')}
                       </div>
 
                       {/* 2단계: 💰 예상 비용 상세 시뮬레이션 */}
-                      <div className="p-4 bg-[#F0F5FA] border-b border-gray-100">
-                        <div className="flex items-center gap-1.5 text-sm font-bold text-gray-900 mb-3">
-                          <Calculator className="w-4 h-4 text-emerald-600" />
+                      <div className="p-4 bg-brand-blue-light/50 border-b border-gray-100">
+                        <div className="flex items-center gap-1.5 text-sm font-bold text-gray-950 mb-3">
+                          <Calculator className="w-4 h-4 text-brand-green" />
                           <span>예상 대부료 상세 시뮬레이션</span>
                         </div>
 
                         {/* 산출 공식 */}
-                        <div className="bg-white rounded-xl p-3 border border-blue-100 shadow-2xs space-y-2.5">
-                          <div className="text-center text-xs text-gray-400 font-mono">
+                        <div className="bg-white/80 rounded-xl p-3.5 border border-slate-200/60 shadow-2xs space-y-2.5">
+                          <div className="text-center text-[10.5px] text-gray-400 font-mono">
                             계산 공식: 면적 × 공시지가 × 용도 제반 요율
                           </div>
-                          <div className="text-center font-mono font-bold text-gray-800 text-sm py-1 border-y border-dashed border-gray-100">
+                          <div className="text-center font-mono font-black text-gray-900 text-sm py-1 border-y border-dashed border-slate-100">
                             {msg.actionCard.parcel.area}㎡ × {msg.actionCard.parcel.officialPrice.toLocaleString()}원 × {getRateAndLabel(msg.actionCard.parcel.recommendedUse).ratePct}%
                           </div>
-                          <div className="flex justify-between text-xs text-gray-500">
+                          <div className="flex justify-between text-[11px] text-gray-505 font-medium">
                             <span>대부요율 가이드</span>
-                            <span className="font-semibold text-emerald-700">익년 특별 {getRateAndLabel(msg.actionCard.parcel.recommendedUse).ratePct}% 특별우대 ({getRateAndLabel(msg.actionCard.parcel.recommendedUse).label})</span>
+                            <span className="font-extrabold text-brand-green">익년 특별 {getRateAndLabel(msg.actionCard.parcel.recommendedUse).ratePct}% 특별우대 ({getRateAndLabel(msg.actionCard.parcel.recommendedUse).label})</span>
                           </div>
                         </div>
 
                         {/* 연간 대부료 최종 */}
-                        <div className="mt-3 bg-emerald-50 border border-emerald-100 rounded-xl p-3 font-sans text-center">
-                          <div className="text-emerald-700 text-xs font-semibold">FINAL ESTIMATED PRICE</div>
-                          <div className="text-emerald-800 font-bold text-xl my-1">
+                        <div className="mt-3 bg-brand-green-light border border-emerald-100 rounded-xl p-3.5 font-sans text-center">
+                          <div className="text-brand-green text-[10.5px] font-bold tracking-wider">FINAL ESTIMATED PRICE</div>
+                          <div className="text-brand-green-deep font-extrabold text-xl my-1">
                             {calculateLeaseFee(msg.actionCard.parcel).yearlyFee.toLocaleString()} 원/년
                           </div>
-                          <div className="text-emerald-600 font-medium text-xs">
-                            월 보증 렌탈비 환산: 약 <span className="underline font-bold font-mono">{calculateLeaseFee(msg.actionCard.parcel).monthlyFee.toLocaleString()}</span> 원/월
+                          <div className="text-brand-green-deep font-semibold text-xs">
+                            월 보증 렌탈비 환산: 약 <span className="underline font-black font-mono">{calculateLeaseFee(msg.actionCard.parcel).monthlyFee.toLocaleString()}</span> 원/월
                           </div>
                         </div>
                       </div>

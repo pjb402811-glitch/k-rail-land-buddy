@@ -61,6 +61,15 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
   const [selectedUsage, setSelectedUsage] = useState('All Usage');
   const [activeDetailParcel, setActiveDetailParcel] = useState<LandParcel | null>(null);
   
+  // 페이지네이션 상태 추가 (대용량 JSON 로드 시 쾌적한 렌더링 성능 최적화 보장)
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 50;
+
+  // 검색/필터 변경 시 페이지를 1로 리셋하여 싱크 유연화
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedRegion, selectedUsage]);
+
   // CSV 및 PDF 업로드 관련 상태
   const [dragActive, setDragActive] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<{ type: 'success' | 'error' | 'loading' | null; message: string }>({ type: null, message: '' });
@@ -99,6 +108,10 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
 
     return matchesSearch && matchesRegion && matchesUsage;
   });
+
+  // 대용량 자산 데이터 성능 최적화를 위한 윈도잉 슬라이싱
+  const displayedParcels = filteredParcels.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const totalPages = Math.ceil(filteredParcels.length / pageSize);
 
   const handleConsultParcel = (parcel: LandParcel) => {
     onSelectParcel(parcel.id);
@@ -504,7 +517,7 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
               officialPrice: officialPrice > 0 ? officialPrice : 140000,
               recommendedUse,
               restrictions: '철도보호지구 저촉 행위신고 필 대상지',
-              status: '대부가능', // 추가
+              status: '대부가능',
               imageUrl: isFarming(recommendedUse)
                 ? 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80'
                 : 'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80',
@@ -556,33 +569,31 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
   const triggerFileSelect = () => {
     fileInputRef.current?.click();
   };
-
-  return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans" id="inventory_management_root">
       {/* 타이틀 및 해설 */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4" id="inventory_header_bar">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <Landmark className="w-5 h-5 text-[#00529C]" />
+          <h1 className="text-xl font-sans font-black text-gray-950 flex items-center gap-2 tracking-tight">
+            <Landmark className="w-5 h-5 text-brand-blue" />
             Land Inventory Management
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-400 font-medium mt-1">
             철도 가용 노선 인접 마스터 자산목록을 투명하게 검색하고 예상 렌탈 시뮬레이션을 상담해드립니다
           </p>
         </div>
-        <div className="flex bg-[#E1F0FF] text-[#00529C] px-3 py-1.5 rounded-full text-xs font-bold items-center gap-1">
-          <Check className="w-4 h-4" /> K-Rail 데이터 100% 동기화완료
+        <div className="flex bg-brand-blue-light/75 border border-brand-blue/15 text-brand-blue-deep px-3.5 py-1.5 rounded-full text-xs font-black items-center gap-1 shadow-3xs">
+          <Check className="w-4 h-4 text-brand-blue" /> K-Rail 데이터 100% 동기화완료
         </div>
       </div>
 
       {/* 📥 대표님의 100% 오픈 API 기반 엑셀/CSV 및 PDF 일괄 로더 존 (Drag & Drop) */}
       {!hideUploader && (
-        <div className="bg-white rounded-2xl border border-gray-150 p-5 shadow-xs animate-in fade-in slide-in-from-top duration-300" id="excel_uploader_card">
+        <div className="glass-card p-5 animate-in fade-in slide-in-from-top duration-300 rounded-3xl" id="excel_uploader_card">
           <div className="flex items-center gap-2 mb-3.5">
-            <FileSpreadsheet className="w-5 h-5 text-[#009C5E]" />
-            <h2 className="font-sans font-bold text-sm text-gray-900 flex items-center gap-1.5">
+            <FileSpreadsheet className="w-5 h-5 text-brand-green" />
+            <h2 className="font-sans font-black text-sm text-gray-950 flex items-center gap-1.5 tracking-tight">
               100% 오픈 API 기반 엑셀/CSV & 정부 공고 PDF 스캐너 존
-              <span className="text-[10px] bg-emerald-100 text-[#006e1c] px-2 py-0.5 rounded-full font-bold">Hybrid Scanner Active</span>
+              <span className="text-[10px] bg-brand-green-light text-brand-green font-bold px-2 py-0.5 rounded-full border border-brand-green/10">Hybrid Scanner Active</span>
             </h2>
           </div>
 
@@ -592,10 +603,10 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileSelect}
-            className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+            className={`border-2 border-dashed rounded-2xl p-7 text-center cursor-pointer transition-all duration-350 flex flex-col items-center justify-center gap-2.5 ${
               dragActive 
-                ? 'border-[#009C5E] bg-emerald-50/30' 
-                : 'border-gray-200 hover:border-[#009C5E] hover:bg-gray-55/20'
+                ? 'border-brand-green bg-brand-green-light/40 shadow-inner scale-99' 
+                : 'border-slate-200 hover:border-brand-green/70 hover:bg-slate-50/50'
             }`}
             id="drop_zone_area"
           >
@@ -607,15 +618,15 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
               accept=".csv,.pdf,.xlsx,.xls"
               id="csv_file_loader_input"
             />
-            <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#009C5E] flex items-center justify-center shadow-3xs mb-1">
-              <Upload className="w-5.5 h-5.5" />
+            <div className="w-12 h-12 rounded-full bg-brand-green-light text-brand-green flex items-center justify-center shadow-sm mb-1 border border-brand-green/10 animate-pulse">
+              <Upload className="w-5.5 h-5.5 text-brand-green" />
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-800">대표님, 준비하신 토지 목록 Excel 또는 정부 공고 PDF 파일을 여기에 끌어다 놓으세요!</p>
-              <p className="text-[10.5px] text-gray-400 mt-1">또는 마우스로 클릭하여 PC에서 직접 파일을 선택하셔도 일괄 파싱 로드됩니다.</p>
+              <p className="text-xs font-black text-gray-900">대표님, 준비하신 토지 목록 Excel 또는 정부 공고 PDF 파일을 여기에 끌어다 놓으세요!</p>
+              <p className="text-[10.5px] text-gray-400 mt-1 font-medium">또는 마우스로 클릭하여 PC에서 직접 파일을 선택하셔도 일괄 파싱 로드됩니다.</p>
             </div>
-            <div className="flex items-center gap-1.5 text-[9.5px] text-gray-500 mt-1 bg-gray-55 px-3 py-1.5 rounded-md border border-gray-150 max-w-2xl mx-auto text-left leading-normal">
-              <Info className="w-4 h-4 text-[#009C5E] shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 text-[9.5px] text-gray-500 mt-2 bg-slate-50 border border-slate-200/50 p-3 rounded-xl max-w-2xl mx-auto text-left leading-relaxed shadow-3xs">
+              <Info className="w-4 h-4 text-brand-green shrink-0 mt-0.5" />
               <span>
                 <strong>하이브리드 로더 가이드:</strong> 
                 <br />
@@ -628,29 +639,29 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
 
           {/* 업로드 결과 피드백 메세지 */}
           {uploadStatus.type && (
-            <div className={`mt-4 p-3.5 rounded-xl border flex items-start gap-2.5 text-xs leading-relaxed animate-in fade-in-50 duration-200 ${
+            <div className={`mt-4 p-4 rounded-2xl border flex items-start gap-3 text-xs leading-relaxed animate-in fade-in-50 duration-200 ${
               uploadStatus.type === 'success' 
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-950 shadow-2xs' 
+                ? 'bg-brand-green-light border-emerald-200 text-emerald-950 shadow-3xs' 
                 : uploadStatus.type === 'loading'
-                  ? 'bg-blue-50 border-blue-200 text-blue-950 animate-pulse'
-                  : 'bg-red-50 border-red-200 text-red-950'
+                  ? 'bg-brand-blue-light/50 border-brand-blue/15 text-brand-blue-deep animate-pulse'
+                  : 'bg-rose-50 border-rose-200 text-rose-950'
             }`}>
               {uploadStatus.type === 'success' ? (
-                <Check className="w-4.5 h-4.5 text-[#009C5E] shrink-0 mt-0.5" />
+                <Check className="w-4.5 h-4.5 text-brand-green shrink-0 mt-0.5" />
               ) : uploadStatus.type === 'loading' ? (
-                <RefreshCw className="w-4.5 h-4.5 text-blue-650 shrink-0 mt-0.5 animate-spin" />
+                <RefreshCw className="w-4.5 h-4.5 text-brand-blue shrink-0 mt-0.5 animate-spin" />
               ) : (
-                <AlertCircle className="w-4.5 h-4.5 text-red-650 shrink-0 mt-0.5" />
+                <AlertCircle className="w-4.5 h-4.5 text-rose-600 shrink-0 mt-0.5" />
               )}
               <div>
-                <p className="font-bold">
+                <p className="font-extrabold">
                   {uploadStatus.type === 'success' 
                     ? '데이터 동적 조립 및 이식 성공' 
                     : uploadStatus.type === 'loading'
                       ? '스캔 동작 가동 중'
                       : '업로드 및 스캔 오류 발생'}
                 </p>
-                <p className="mt-0.5 text-[11px] opacity-90">{uploadStatus.message}</p>
+                <p className="mt-0.5 text-[11px] font-semibold opacity-90">{uploadStatus.message}</p>
               </div>
             </div>
           )}
@@ -658,30 +669,30 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
       )}
 
       {/* 필터 세면대 상단바 */}
-      <div className="bg-white rounded-2xl border border-gray-150 shadow-xs p-5 grid grid-cols-1 md:grid-cols-4 gap-4" id="inventory_filters_bar">
+      <div className="glass-card p-5 grid grid-cols-1 md:grid-cols-4 gap-4 rounded-3xl" id="inventory_filters_bar">
         {/* 검색 인풋 */}
-        <div className="space-y-1 md:col-span-2">
-          <label className="block text-xs font-bold text-gray-500">Search by Site ID / Address (부지번호 및 소재지 검색)</label>
+        <div className="space-y-1.5 md:col-span-2">
+          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Search by Site ID / Address (부지번호 및 소재지 검색)</label>
           <div className="relative">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input 
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="예: KR-001, 대전역 인근, EX-0101, PD-0200, 주말농장 등"
-              className="w-full bg-gray-50 text-xs border border-gray-200 focus:border-[#00529C] outline-none rounded-xl pl-10 pr-4 py-3 placeholder:text-gray-400 text-gray-700 font-sans"
+              className="w-full bg-slate-55 border border-slate-200 focus:border-brand-blue focus:ring-1 focus:ring-brand-blue outline-none rounded-xl pl-10 pr-4 py-3 placeholder:text-gray-400 text-gray-800 font-sans font-medium text-xs shadow-inner"
               id="search_site_id_input"
             />
           </div>
         </div>
 
         {/* 지역 셀렉터 */}
-        <div className="space-y-1">
-          <label className="block text-xs font-bold text-gray-500">Region (지역 선택)</label>
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Region (지역 선택)</label>
           <select 
             value={selectedRegion}
             onChange={(e) => setSelectedRegion(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 text-xs rounded-xl p-3 outline-none focus:ring-1 focus:ring-[#00529C] text-gray-700"
+            className="w-full bg-slate-55 border border-slate-200 text-xs rounded-xl p-3 outline-none focus:ring-1 focus:ring-brand-blue font-sans font-medium text-gray-800"
             id="region_select_filter"
           >
             {regions.map((r, ri) => (
@@ -691,12 +702,12 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
         </div>
 
         {/* 목적 분류 셀렉터 */}
-        <div className="space-y-1">
-          <label className="block text-xs font-bold text-gray-500">Usage Type (용도 선택)</label>
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Usage Type (용도 선택)</label>
           <select 
             value={selectedUsage}
             onChange={(e) => setSelectedUsage(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 text-xs rounded-xl p-3 outline-none focus:ring-1 focus:ring-[#00529C] text-gray-700"
+            className="w-full bg-slate-55 border border-slate-200 text-xs rounded-xl p-3 outline-none focus:ring-1 focus:ring-brand-blue font-sans font-medium text-gray-800"
             id="usage_select_filter"
           >
             {usages.map((u, ui) => (
@@ -707,59 +718,59 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
       </div>
 
       {/* 부지 데이터 테이블 */}
-      <div className="bg-white rounded-2xl border border-gray-150 shadow-xs overflow-hidden" id="inventory_table_card">
+      <div className="glass-card overflow-hidden rounded-3xl" id="inventory_table_card">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left" id="inventory_table_element">
-            <thead className="bg-[#f8f9fa] border-b border-gray-200 text-gray-600 uppercase tracking-wider font-sans">
+            <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase tracking-wider font-sans">
               <tr>
-                <th className="p-3.5 font-semibold">Site ID (부지번호)</th>
-                <th className="p-3.5 font-semibold">Address (소재지)</th>
-                <th className="p-3.5 font-semibold text-right">Area (면적)</th>
-                <th className="p-3.5 font-semibold">Type/Purpose (용지/지목)</th>
-                <th className="p-3.5 font-semibold text-center">Status (상태)</th>
-                <th className="p-3.5 font-semibold text-center">Details (보기)</th>
+                <th className="p-4.5 font-bold tracking-wider">Site ID (부지번호)</th>
+                <th className="p-4.5 font-bold tracking-wider">Address (소재지)</th>
+                <th className="p-4.5 font-bold tracking-wider text-right">Area (면적)</th>
+                <th className="p-4.5 font-bold tracking-wider">Type/Purpose (용지/지목)</th>
+                <th className="p-4.5 font-bold tracking-wider text-center">Status (상태)</th>
+                <th className="p-4.5 font-bold tracking-wider text-center">Details (보기)</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredParcels.length > 0 ? (
-                filteredParcels.map((parcel) => (
-                  <tr key={parcel.id} className="hover:bg-gray-50/50 transition duration-150 text-gray-700 animate-in fade-in-50 duration-150">
-                    <td className="p-3.5 font-mono flex items-center gap-1.5 font-bold text-[#00529C]">
+            <tbody className="divide-y divide-slate-100">
+              {displayedParcels.length > 0 ? (
+                displayedParcels.map((parcel) => (
+                  <tr key={parcel.id} className="hover:bg-slate-50/70 transition-colors duration-150 text-gray-700 animate-in fade-in-50 duration-150">
+                    <td className="p-4.5 font-mono flex items-center gap-1.5 font-black text-brand-blue">
                       {parcel.id.startsWith('PD-') ? (
-                        <FileText className="w-3.5 h-3.5 text-emerald-600 shrink-0" title="PDF에서 스캔된 부지" />
+                        <FileText className="w-4 h-4 text-brand-green shrink-0 animate-pulse" title="PDF에서 스캔된 부지" />
                       ) : parcel.id.startsWith('EX-') ? (
-                        <FileSpreadsheet className="w-3.5 h-3.5 text-[#009C5E] shrink-0" title="CSV에서 로드된 부지" />
+                        <FileSpreadsheet className="w-4 h-4 text-brand-green shrink-0" title="CSV에서 로드된 부지" />
                       ) : (
-                        <Landmark className="w-3.5 h-3.5 text-blue-650 shrink-0" />
+                        <Landmark className="w-4 h-4 text-brand-blue-deep shrink-0" />
                       )}
                       {parcel.id}
                     </td>
-                    <td className="p-3.5">
-                      <div className="font-bold text-gray-950 font-sans">{parcel.address.split('(')[0]}</div>
-                      <div className="text-[10px] text-gray-400 truncate max-w-[280px]" title={parcel.address}>{parcel.address}</div>
+                    <td className="p-4.5">
+                      <div className="font-extrabold text-gray-900 font-sans">{parcel.address.split('(')[0]}</div>
+                      <div className="text-[10px] text-gray-400 font-semibold truncate max-w-[280px]" title={parcel.address}>{parcel.address}</div>
                     </td>
-                    <td className="p-3.5 text-right font-mono font-bold text-gray-800">{parcel.area.toLocaleString()} ㎡</td>
-                    <td className="p-3.5">
-                      <span className="font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded mr-1.5 text-[10px]">{parcel.landType}</span>
-                      <span className="text-gray-500 font-sans">{parcel.recommendedUse}</span>
+                    <td className="p-4.5 text-right font-mono font-extrabold text-gray-800">{parcel.area.toLocaleString()} ㎡</td>
+                    <td className="p-4.5">
+                      <span className="font-extrabold text-brand-blue bg-brand-blue-light/50 border border-brand-blue/10 px-2 py-0.5 rounded-lg mr-1.5 text-[9.5px] uppercase tracking-wide">{parcel.landType}</span>
+                      <span className="text-gray-500 font-sans font-medium">{parcel.recommendedUse}</span>
                     </td>
-                    <td className="p-3.5 text-center">
+                    <td className="p-4.5 text-center">
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-block ${
                         parcel.status === '대부가능' 
-                          ? 'bg-emerald-50 text-[#006e1c] border-emerald-200' 
-                          : 'bg-gray-150 text-gray-600 border-gray-200'
+                          ? 'bg-brand-green-light text-brand-green-deep border-emerald-250' 
+                          : 'bg-slate-100 text-slate-650 border-slate-200'
                       }`}>
                         {parcel.status}
                       </span>
                     </td>
-                    <td className="p-3.5 text-center">
+                    <td className="p-4.5 text-center">
                       <button 
                         onClick={() => setActiveDetailParcel(parcel)}
-                        className="text-gray-400 hover:text-[#00529C] p-1.5 hover:bg-gray-100 rounded-lg transition"
+                        className="text-slate-400 hover:text-brand-blue p-2 hover:bg-slate-100 rounded-xl transition-all duration-200 active:scale-90"
                         title="부지 상세조회"
                         id={`btn_view_${parcel.id}`}
                       >
-                        <Eye className="w-4 h-4 inline" />
+                        <Eye className="w-4.5 h-4.5 inline" />
                       </button>
                     </td>
                   </tr>
@@ -767,24 +778,57 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
               ) : (
                 <tr>
                   <td colSpan={6} className="p-10 text-center font-sans text-gray-400">
-                    <p className="font-bold text-[#00529C] text-sm mb-1">일치하는 철도유휴부지가 없습니다</p>
-                    <p className="text-xs text-gray-500">상위 검색 요건이나 지역 관할본부를 다시 조정해 보시거나 랜드버디 챗봇에 연계 비전을 질문바랍니다.</p>
+                    <p className="font-black text-brand-blue text-sm mb-1">일치하는 철도유휴부지가 없습니다</p>
+                    <p className="text-xs text-gray-400 font-semibold">상위 검색 요건이나 지역 관할본부를 다시 조정해 보시거나 랜드버디 챗봇에 연계 비전을 질문바랍니다.</p>
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        
+        {/* 페이지네이션 콘트롤러 (SaaS 프리미엄 대용량 데이터 성능 핸들러) */}
+        {totalPages > 1 && (
+          <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between font-sans text-[11px]" id="inventory_pagination">
+            <div className="text-slate-500 font-medium">
+              총 <span className="font-extrabold text-brand-blue">{filteredParcels.length}</span>개의 부지 중{' '}
+              <span className="font-extrabold text-gray-900">
+                {Math.min(filteredParcels.length, (currentPage - 1) * pageSize + 1).toLocaleString()}-
+                {Math.min(filteredParcels.length, currentPage * pageSize).toLocaleString()}
+              </span>
+              건 표시
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className="px-3 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-700 font-extrabold hover:bg-slate-50 hover:border-slate-350 transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+              >
+                이전
+              </button>
+              <span className="px-3 font-extrabold text-gray-750">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                className="px-3 py-1.5 border border-slate-200 bg-white rounded-xl text-slate-700 font-extrabold hover:bg-slate-50 hover:border-slate-350 transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+              >
+                다음
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 하단: 통계 및 비전 피드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6" id="inventory_footer_stats">
         {/* 인벤토리 활성 비율 - Inventory Health 백분율 차트 */}
-        <div className="bg-white rounded-2xl border border-gray-150 p-5 flex items-center justify-between shadow-xs" id="inventory_health_card">
+        <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="inventory_health_card">
           <div className="space-y-2">
-            <span className="text-xs font-semibold text-gray-455 block uppercase tracking-wider">INVENTORY HEALTH (가용률)</span>
-            <h3 className="font-sans font-bold text-2xl text-gray-900 leading-tight">{Math.round((parcels.filter(p => p.status === '대부가능').length / parcels.length) * 100)}% 개방 완료</h3>
-            <p className="text-xs text-gray-500 leading-relaxed font-sans mr-2">
+            <span className="text-[10px] font-black text-slate-400 block uppercase tracking-widest">INVENTORY HEALTH (가용률)</span>
+            <h3 className="font-sans font-black text-2xl text-gray-950 leading-none tracking-tight">{Math.round((parcels.filter(p => p.status === '대부가능').length / parcels.length) * 100)}% 개방 완료</h3>
+            <p className="text-xs text-gray-500 leading-relaxed font-sans font-medium pr-3">
               전체 {parcels.length}개의 등록 자산 중, {parcels.filter(p => p.status === '대부가능').length}개의 부지가 안전 대부 승인되어 즉시 대부 신청 가용 상태입니다.
             </p>
           </div>
@@ -792,30 +836,30 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
           <div className="relative w-24 h-24 shrink-0 flex items-center justify-center" id="donut_chart_svg">
             <svg className="w-full h-full transform -rotate-90">
               {/* 회색 밑선 회로 */}
-              <circle cx="48" cy="48" r="38" stroke="#E9ECEF" strokeWidth="8" fill="transparent" />
-              {/* 녹색 가용 회로 */}
-              <circle cx="48" cy="48" r="38" stroke="#00529C" strokeWidth="8" fill="transparent" 
+              <circle cx="48" cy="48" r="38" stroke="#F1F5F9" strokeWidth="8" fill="transparent" />
+              {/* 청색 가용 회로 */}
+              <circle cx="48" cy="48" r="38" stroke="var(--brand-blue)" strokeWidth="8" fill="transparent" 
                 strokeDasharray="238.76" 
                 strokeDashoffset={238.76 - (238.76 * (parcels.filter(p => p.status === '대부가능').length / parcels.length))}
               />
             </svg>
-            <span className="absolute text-sm font-bold font-mono text-[#00529C]">
+            <span className="absolute text-sm font-black font-mono text-brand-blue">
               {Math.round((parcels.filter(p => p.status === '대부가능').length / parcels.length) * 100)}%
             </span>
           </div>
         </div>
 
         {/* 지역 분포 분석 피드 배너 */}
-        <div className="bg-[#f0f4f8] border border-blue-100 rounded-2xl p-5 flex flex-col justify-between shadow-xs" id="regional_distribution_card">
+        <div className="bg-brand-blue-light/50 border border-brand-blue/10 rounded-3xl p-5 flex flex-col justify-between shadow-xs" id="regional_distribution_card">
           <div>
-            <span className="text-xs font-semibold text-[#00529C] block uppercase tracking-wider mb-1">REGIONAL DISTRIBUTION</span>
-            <p className="text-xs text-gray-750 leading-relaxed font-sans">
+            <span className="text-[10px] font-black text-brand-blue-deep block uppercase tracking-widest mb-1.5">REGIONAL DISTRIBUTION</span>
+            <p className="text-xs text-gray-700 leading-relaxed font-sans font-medium">
               현재 저희 공간 복지 시스템에서는 **대전 광역권**의 특화 푸드트럭, 텃밭 사업이 활발히 시범 구동 중이나, 대표님이 새로 가져오시는 광역 엑셀 리스트와 지자체 공고문 PDF 스캔 기능을 통해 전국의 유휴부지가 맵과 인공지능 챗봇 비서에 즉시 연결 및 실시간 확장됩니다!
             </p>
           </div>
           <button 
             onClick={onGoToAssistant}
-            className="text-xs font-bold text-[#00529C] hover:underline text-left mt-3 flex items-center gap-1"
+            className="text-xs font-extrabold text-brand-blue hover:text-brand-blue-deep hover:underline text-left mt-3 flex items-center gap-1 cursor-pointer transition-colors duration-150"
             id="btn_view_analytics_map"
           >
             K-Rail 랜드버디 즉시 상담 바로가기 ➡️
@@ -825,22 +869,22 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
 
       {/* 부지 정보 상세 모달 팝업 */}
       {activeDetailParcel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4" id="inventory_detail_modal">
-          <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-xl border border-gray-150 animate-in fade-in-50 zoom-in-95" id="detail_modal_container">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" id="inventory_detail_modal">
+          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-slate-150 animate-in fade-in-50 zoom-in-95" id="detail_modal_container">
             {/* 이미지 */}
-            <div className="relative h-48 bg-gray-100 shrink-0 scroll-none">
+            <div className="relative h-48 bg-slate-50 shrink-0 scroll-none">
               <img 
                 src={activeDetailParcel.imageUrl} 
                 alt={activeDetailParcel.id} 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-mono font-bold">
+              <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-mono font-bold">
                 {activeDetailParcel.id}
               </div>
               <button 
                 onClick={() => setActiveDetailParcel(null)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/50 text-white font-bold text-sm flex items-center justify-center hover:bg-black/70"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/50 text-white font-bold text-sm flex items-center justify-center hover:bg-black/70 transition cursor-pointer"
                 id="btn_close_detail_modal"
               >
                 ✕
@@ -848,23 +892,23 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
             </div>
 
             {/* 본문 - 스크롤 적용 */}
-            <div className="p-6 space-y-4 text-xs overflow-y-auto flex-1" id="detail_modal_body">
+            <div className="p-6 space-y-4 text-xs overflow-y-auto flex-1 scrollbar-none" id="detail_modal_body">
               <div>
-                <span className="text-[10px] bg-blue-100 text-[#00529C] px-2 py-0.5 rounded font-bold font-mono">
+                <span className="text-[10px] bg-brand-blue-light/75 border border-brand-blue/15 text-brand-blue-deep px-2.5 py-0.5 rounded-lg font-bold font-mono">
                   {activeDetailParcel.landType} • 면적 {activeDetailParcel.area}㎡
                 </span>
-                <h3 className="text-base font-bold text-gray-900 mt-2">{activeDetailParcel.address}</h3>
-                <p className="text-gray-500 mt-1 font-sans">공시지가: <span className="font-bold font-mono text-gray-800">₩{activeDetailParcel.officialPrice.toLocaleString()} / ㎡</span></p>
+                <h3 className="text-base font-sans font-black text-gray-950 mt-2 tracking-tight">{activeDetailParcel.address}</h3>
+                <p className="text-gray-400 mt-1 font-sans font-semibold">공시지가: <span className="font-bold font-mono text-gray-800">₩{activeDetailParcel.officialPrice.toLocaleString()} / ㎡</span></p>
               </div>
 
-              <div className="bg-gray-55 rounded-xl p-4 space-y-2.5 border border-gray-150">
-                <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                  <span className="font-semibold text-gray-600">추천 한도 용도</span>
-                  <span className="font-semibold text-emerald-700">{activeDetailParcel.recommendedUse}</span>
+              <div className="bg-slate-50/80 rounded-2xl p-4.5 space-y-2.5 border border-slate-150 shadow-inner">
+                <div className="flex justify-between items-center pb-2 border-b border-slate-200">
+                  <span className="font-bold text-slate-500">추천 한도 용도</span>
+                  <span className="font-black text-brand-green">{activeDetailParcel.recommendedUse}</span>
                 </div>
                 <div className="flex justify-between items-start pt-1 gap-2">
-                  <span className="font-semibold text-gray-600 shrink-0">규제/특이사항</span>
-                  <span className="text-right text-gray-755 font-medium leading-relaxed">{activeDetailParcel.restrictions}</span>
+                  <span className="font-bold text-slate-500 shrink-0">규제/특이사항</span>
+                  <span className="text-right text-gray-700 font-bold leading-relaxed">{activeDetailParcel.restrictions}</span>
                 </div>
               </div>
 
@@ -882,26 +926,26 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
                 waterDistance={activeDetailParcel.waterDistance}
               />
 
-              <div className="bg-blue-50/50 p-3.5 rounded-xl text-blue-800 font-sans border border-blue-50">
-                ⭐ **국민 공간 복지 안내:** 대전역 청년 창업 요율(3%), 경작용(1%) 등 맞춤 설계에 관하여 랜드버디 가상 시큐리티 계산을 받으시려면 아래 비서 상담 버튼을 눌러주세요.
+              <div className="bg-brand-blue-light/50 p-4 rounded-2xl text-brand-blue-deep font-sans border border-brand-blue/10 leading-relaxed font-semibold">
+                ⭐ <strong>국민 공간 복지 안내:</strong> 대전역 청년 창업 요율(3%), 경작용(1%) 등 맞춤 설계에 관하여 랜드버디 가상 시큐리티 계산을 받으시려면 아래 비서 상담 버튼을 눌러주세요.
               </div>
             </div>
 
             {/* 하단 액션 버튼 바 - 하단 고정 */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-2.5 shrink-0" id="detail_modal_actions">
+            <div className="p-4.5 bg-slate-50 border-t border-slate-100 flex gap-2.5 shrink-0" id="detail_modal_actions">
               <button 
                 onClick={() => setActiveDetailParcel(null)}
-                className="flex-1 py-3 border border-gray-300 bg-white rounded-xl text-gray-700 font-semibold text-center hover:bg-gray-50 transition"
+                className="flex-1 py-3 border border-slate-300 bg-white rounded-xl text-slate-700 font-extrabold text-center hover:bg-slate-50 transition active:scale-97 cursor-pointer"
                 id="btn_close_detail"
               >
                 닫기
               </button>
               <button 
                 onClick={() => handleConsultParcel(activeDetailParcel)}
-                className="flex-1 py-3 bg-[#00529C] hover:bg-[#004788] text-white font-bold rounded-xl text-center shadow-md flex items-center justify-center gap-1"
+                className="flex-1 py-3 btn-premium-luxury text-white font-extrabold rounded-xl text-center shadow-md flex items-center justify-center gap-1 active:scale-97 cursor-pointer"
                 id="btn_go_chat_from_inventory"
               >
-                <Sparkles className="w-4.5 h-4.5 shrink-0" />
+                <Sparkles className="w-4.5 h-4.5 shrink-0 text-emerald-300" />
                 K-Rail 비서 연결 문의
               </button>
             </div>
