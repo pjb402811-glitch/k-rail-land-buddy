@@ -363,7 +363,7 @@ ${추가지침}
 ${logs.join('\n')}
 \`\`\`
 \n`;
-              replyText = terminalLogs + geminiText;
+              replyText = geminiText;
             } else {
               replyText = geminiText;
             }
@@ -538,7 +538,7 @@ ${logs.join('\n')}
             step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조(영구건축물 축조 금지)에 의거하여 단단한 콘크리트 빌딩 등의 구축은 불가하므로 가설건축물 형태로 유연하게 대안 설계도를 준비하셔야 동법 제31조(5년 한도 사용허가(임차)) 승인을 얻습니다.`;
           }
 
-          replyText = terminalLogs + `요청하신 용도와 목적에 맞추어 **국토교통부 표준 및 공간정보 연계 API**의 데이터를 실시간 조립하여 최고의 철도 유휴부지 매칭 결과를 도출했습니다.
+          replyText = `요청하신 용도와 목적에 맞추어 **국토교통부 표준 및 공간정보 연계 API**의 데이터를 실시간 조립하여 최고의 철도 유휴부지 매칭 결과를 도출했습니다.
 
 ### 🚉 [기반] 매칭 유휴부지 기본 정보
 - **부지 소재지:** ${parcel.address} [부지번호: ${parcel.id}]
