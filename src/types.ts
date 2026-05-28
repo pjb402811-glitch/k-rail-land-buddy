@@ -11,7 +11,7 @@ export interface LandParcel {
   officialPrice: number; // 공시지가 (원/㎡)
   recommendedUse: string; // 추천용도
   restrictions: string; // 규제 및 특이사항
-  status: '대부가능' | '계약중' | '보류' | '심사중'; // 대부상태
+  status: '사용허가(임차)가능' | '계약중' | '보류' | '심사중'; // 사용허가(임차)상태
   imageUrl?: string; // 부지 예시 이미지 URL
   region: string; // 대전, 세종, 서울, 부산, 대구, 광주, 강원 등
   // --- 대표님 오더 100% 오픈 API 기반 데이터 매핑 정보 추가 ---
@@ -31,7 +31,7 @@ export interface LeaseApplication {
   parcelId: string;
   address: string;
   purpose: string;
-  leasePeriod: number; // 대부 기간 (개월 단위, 기본 12)
+  leasePeriod: number; // 사용허가(임차) 기간 (개월 단위, 기본 12)
   startDate: string;
   endDate: string;
   appliedDate: string;

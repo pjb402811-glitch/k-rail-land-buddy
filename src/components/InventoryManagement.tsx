@@ -307,7 +307,7 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
               officialPrice: rawPrice > 0 ? rawPrice : 120000,
               recommendedUse: rawUse,
               restrictions: rawRest,
-              status: '대부가능',
+              status: '사용허가(임차)가능',
               imageUrl: isFarming(rawUse)
                 ? 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80'
                 : 'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80',
@@ -396,7 +396,7 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
             officialPrice: rawPrice > 0 ? rawPrice : 120000,
             recommendedUse: rawUse,
             restrictions: rawRest,
-            status: '대부가능',
+            status: '사용허가(임차)가능',
             imageUrl: isFarming(rawUse)
               ? 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80'
               : 'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80',
@@ -517,7 +517,7 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
               officialPrice: officialPrice > 0 ? officialPrice : 140000,
               recommendedUse,
               restrictions: '철도보호지구 저촉 행위신고 필 대상지',
-              status: '대부가능',
+              status: '사용허가(임차)가능',
               imageUrl: isFarming(recommendedUse)
                 ? 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80'
                 : 'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80',
@@ -758,7 +758,7 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
                     </td>
                     <td className="p-4.5 text-center">
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-block ${
-                        parcel.status === '대부가능' 
+                        parcel.status === '사용허가(임차)가능' 
                           ? 'bg-brand-green-light text-brand-green-deep border-emerald-250' 
                           : 'bg-slate-100 text-slate-650 border-slate-200'
                       }`}>
@@ -829,9 +829,9 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
         <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="inventory_health_card">
           <div className="space-y-2">
             <span className="text-[10px] font-black text-slate-400 block uppercase tracking-widest">INVENTORY HEALTH (가용률)</span>
-            <h3 className="font-sans font-black text-2xl text-gray-950 leading-none tracking-tight">{Math.round((parcels.filter(p => p.status === '대부가능').length / parcels.length) * 100)}% 개방 완료</h3>
+            <h3 className="font-sans font-black text-2xl text-gray-950 leading-none tracking-tight">{Math.round((parcels.filter(p => p.status === '사용허가(임차)가능').length / parcels.length) * 100)}% 개방 완료</h3>
             <p className="text-xs text-gray-500 leading-relaxed font-sans font-medium pr-3">
-              전체 {parcels.length}개의 등록 자산 중, {parcels.filter(p => p.status === '대부가능').length}개의 부지가 안전 대부 승인되어 즉시 대부 신청 가용 상태입니다.
+              전체 {parcels.length}개의 등록 자산 중, {parcels.filter(p => p.status === '사용허가(임차)가능').length}개의 부지가 안전 사용허가(임차) 승인되어 즉시 사용허가(임차) 신청 가용 상태입니다.
             </p>
           </div>
           {/* 미려한 도넛 차트 SVG */}
@@ -842,11 +842,11 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
               {/* 청색 가용 회로 */}
               <circle cx="48" cy="48" r="38" stroke="var(--brand-blue)" strokeWidth="8" fill="transparent" 
                 strokeDasharray="238.76" 
-                strokeDashoffset={238.76 - (238.76 * (parcels.filter(p => p.status === '대부가능').length / parcels.length))}
+                strokeDashoffset={238.76 - (238.76 * (parcels.filter(p => p.status === '사용허가(임차)가능').length / parcels.length))}
               />
             </svg>
             <span className="absolute text-sm font-black font-mono text-brand-blue">
-              {Math.round((parcels.filter(p => p.status === '대부가능').length / parcels.length) * 100)}%
+              {Math.round((parcels.filter(p => p.status === '사용허가(임차)가능').length / parcels.length) * 100)}%
             </span>
           </div>
         </div>

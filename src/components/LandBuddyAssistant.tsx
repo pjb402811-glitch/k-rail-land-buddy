@@ -28,7 +28,7 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
     {
       id: 'welcome',
       sender: 'bot',
-      text: `반갑습니다! 국가철도공단(KR)의 유휴부지 대부(렌탈) 및 공간 복지 맞춤형 비서, **'KR-Land Buddy'**입니다. 🚉💚
+      text: `반갑습니다! 국가철도공단(KR)의 유휴부지 사용허가(임차)(렌탈) 및 공간 복지 맞춤형 비서, **'KR-Land Buddy'**입니다. 🚉💚
       
 대표 표준 공공 API 데이터 조립 연계 모듈이 탑재되어, 지적 공부 및 용도 규제(1단계)와 도로/상하수도/전기 인프라(2단계) 공공데이터를 똑똑하게 파싱하여 시민들이 알기 쉬운 **'친절하고 명쾌한 설명'**으로 3줄 요약해 드립니다!
 
@@ -87,7 +87,7 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
     }
   }, [activeParcelId, parcels]);
 
-  // 대부요율 계산 도우미
+  // 사용허가(임차)요율 계산 도우미
   const getRateAndLabel = (recommendedUse: string): { rate: number; label: string; ratePct: number } => {
     const text = recommendedUse.toLowerCase();
     if (text.includes('농장') || text.includes('농업') || text.includes('텃밭') || text.includes('경작')) {
@@ -127,14 +127,14 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
     if (parcel.isRailwayProtected) {
       easyRule = '기차가 안전하게 지나다니는 보호 구역(철도보호지구) 근처여서, 임시 시설물(푸드트럭, 가설 컨테이너, 미니 가로등)을 두실 때 공단에 가볍게 신고 절차만 한 번 거쳐주시면 끝납니다. (어려운 서류는 제가 다 적어 드려요!)';
     } else {
-      easyRule = '주변에 기차가 정차하는 구역이 인접해 다소의 소음이 발생할 수 있지만, 농작물 재배나 단순 창고용으로 이용하기에 행정상 아무런 걸림돌이 없는 대부 가능지입니다.';
+      easyRule = '주변에 기차가 정차하는 구역이 인접해 다소의 소음이 발생할 수 있지만, 농작물 재배나 단순 창고용으로 이용하기에 행정상 아무런 걸림돌이 없는 사용허가(임차) 가능지입니다.';
     }
     
     return {
       step1: {
-        title: '대부 조건 및 가용 여부 요약',
+        title: '사용허가(임차) 조건 및 가용 여부 요약',
         points: [
-          `이 부지는 면적 ${parcel.area}㎡에 달하는 국유지로서, 대부 목적은 [${parcel.recommendedUse}]에 가장 특화되어 있습니다.`,
+          `이 부지는 면적 ${parcel.area}㎡에 달하는 국유지로서, 사용허가(임차) 목적은 [${parcel.recommendedUse}]에 가장 특화되어 있습니다.`,
           `공시지가는 ㎡당 ${parcel.officialPrice.toLocaleString()}원 수준이며, ${label} 요율인 [${ratePct}%] 우대 금리가 즉각 적용됩니다.`,
           `행정 규정 요약: ${easyRule}`
         ]
@@ -188,9 +188,9 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
                            lowerText.includes('영구시설') || 
                            lowerText.includes('영구건축') || 
                            lowerText.includes('축조') || 
-                           lowerText.includes('대부계약') || 
+                           lowerText.includes('사용허가(임차)계약') || 
                            lowerText.includes('사용허가') || 
-                           lowerText.includes('대부료') || 
+                           lowerText.includes('사용허가(임차)료') || 
                            lowerText.includes('임대료') || 
                            lowerText.includes('감면') || 
                            lowerText.includes('변상금') || 
@@ -284,12 +284,12 @@ export default function LandBuddyAssistant({ onApplySubmit, activeParcelId, onSe
 "${text}"
 
 [필수 분석 지침]
-- 대한민국 국유재산법 조항(제18조 영구시설물 축조 금지, 제30조 사용허가, 제31조 대부기간 및 5년 갱신 혜택, 제32조/제34조 대부요율 농업 1%/창업 3%/일반 5% 감면 특례, 제72조 무단점유 변상금 120% 규정 등)을 기반으로 정교하고 친절하게 전문 행정 솔루션을 제공하라.
+- 대한민국 국유재산법 조항(제18조 영구시설물 축조 금지, 제30조 사용허가, 제31조 사용허가(임차)기간 및 5년 갱신 혜택, 제32조/제34조 사용허가(임차)요율 농업 1%/창업 3%/일반 5% 감면 특례, 제72조 무단점유 변상금 120% 규정 등)을 기반으로 정교하고 친절하게 전문 행정 솔루션을 제공하라.
 - 불필요한 인사는 생략하고 질문에 집중하여 마크다운 표나 리스트로 가독성 높게 정리하라.
 - 마지막에는 쏭비서 특유의 "대표님, 법령 오케스트레이션 공장 정상 가동 중입니다!" 라는 기운찬 확인 멘트로 깔끔하게 끝내라.
 `;
             systemInstruction = `너는 대한민국 국가철도공단의 유휴지 공간복지 활용 전문 AI 비서이자 국유재산 행정법률 수석 컨설턴트인 '쏭비서'이다.
-일반 민원인이 국유재산 대부나 철도 인근 부지 임대와 관련된 법적 질문을 던졌을 때, 최고의 전문성으로 알기 쉽게 통역해 주어라.
+일반 민원인이 국유재산 사용허가(임차)나 철도 인근 부지 임대와 관련된 법적 질문을 던졌을 때, 최고의 전문성으로 알기 쉽게 통역해 주어라.
 국유재산법과 철도안전법에 관한 조문 해석을 명쾌하게 내려주고, 시민들이 흔히 범하기 쉬운 실수(무단 점용, 콘크리트 무단 타설 등)에 대해 친절하게 사전 예방 팁을 제시하여라.`;
           } else if (assembledParcel) {
             // 기존의 부지 매칭 분석 모드
@@ -330,8 +330,8 @@ ${추가지침}
 [국유재산법 전문성 주입]
 반드시 아래의 대한민국 국유재산법 핵심 조항에 근거하여 답변을 작성해야 한다:
 - **제18조 (영구시설물 축조 금지)**: 국가 외의 자는 국유재산에 영구시설물을 축조하지 못하는 것이 대원칙이다. 다만, 철거 및 원상회복이 용이한 가설건축물(컨테이너, 조립식 펜스, 임시 천막 등)의 경우 공단의 승인을 받고 철거이행보증조치(보증서 제출 등)를 마치면 예외적으로 설치가 가능하다.
-- **제31조 / 제35조 (대부계약 및 사용허가 기간)**: 일반 토지 및 정착물의 대부 허가 기간은 기본 **5년 이내**이다. 계약 만료 전 갱신 요건에 부합하면 1회에 한해 5년의 범위에서 갱신이 가능하여, 최장 10년간 장기적으로 안정된 운영 터전이 보장된다.
-- **제32조 (대부요율)**: 일반적인 연간 대부료는 해당 재산가액의 **연 5% 이상**이 기준이다. 다만, 영농/경작용은 1%, 소상공인 창업 및 상업 공간 특례는 3%의 파격적인 우대 감면 요율이 적용된다.
+- **제31조 / 제35조 (사용허가(임차)계약 및 사용허가 기간)**: 일반 토지 및 정착물의 사용허가(임차) 허가 기간은 기본 **5년 이내**이다. 계약 만료 전 갱신 요건에 부합하면 1회에 한해 5년의 범위에서 갱신이 가능하여, 최장 10년간 장기적으로 안정된 운영 터전이 보장된다.
+- **제32조 (사용허가(임차)요율)**: 일반적인 연간 사용허가(임차)료는 해당 재산가액의 **연 5% 이상**이 기준이다. 다만, 영농/경작용은 1%, 소상공인 창업 및 상업 공간 특례는 3%의 파격적인 우대 감면 요율이 적용된다.
 
 반드시 사용자가 제시하는 [부지 정보], [신청 용도], [★ 필수 분석 지침 ★]을 엄격히 분석하여 지정된 [출력 형식]에 맞추어 "인간의 따뜻한 언어"로 답변해야 한다.
 
@@ -341,7 +341,7 @@ ${추가지침}
 3. 2줄: 이 부지에서 해당 사업을 할 때의 명확한 장점과 렌탈비 메리트 서술.
 4. 3줄: 국유재산법(제18조 가설물 우회와 이행보증보험 팁, 제31조 최초 5년 계약 및 갱신 특혜)을 준수하기 위한 가설물 활용 및 인허가 팁 안내 서술.
 5. 시민 눈높이에 맞춰 행정/전문 용어를 아주 쉽게 풀어 써라.
-6. 만약 추천 부지 매칭이 발생했다면 답변 마지막에 대부 대상 부지 ID를 [MATCH_PARCEL: ${assembledParcel.id}] 형태로 남겨다오.`;
+6. 만약 추천 부지 매칭이 발생했다면 답변 마지막에 사용허가(임차) 대상 부지 ID를 [MATCH_PARCEL: ${assembledParcel.id}] 형태로 남겨다오.`;
           }
 
           if (finalPrompt && systemInstruction) {
@@ -397,43 +397,43 @@ ${logs.join('\n')}
 
 **2. 합법적인 우회 및 예외 팁 (가설물 설계)**
 - **이동식 가설건축물 활용:** 콘크리트 기초 타설을 하지 않고, 볼트 체결식이나 견인이 가능한 **이동식 컨테이너, 조립식 펜스, 간이 천막** 등은 영구시설물에 해당하지 않아 허용됩니다!
-- **원상회복 이행보증조치:** 허가를 신청할 때 대부 종료 시 자진 철거하겠다는 **철거 각서 및 철거이행보증보험증권**을 공단에 제출하면 즉시 승인이 가용합니다.
+- **원상회복 이행보증조치:** 허가를 신청할 때 사용허가(임차) 종료 시 자진 철거하겠다는 **철거 각서 및 철거이행보증보험증권**을 공단에 제출하면 즉시 승인이 가용합니다.
 - **예외적 기부채납:** 국가에 소유권을 이전(기부채납)하고 사용료를 면제받는 형태로 영구물을 짓는 특례가 있으나, 소상공인 수준에서는 가설건축물 형태의 우회 전략이 가장 신속하고 유리합니다.
 
 *💡 **쏭비서의 팁:** 주말농장의 간이 쉼터나 푸드트럭 야외 테라스, 애견운동장 안전 펜스는 모두 100% 가설물에 해당하여 문제없이 즉시 승인됩니다! 대표님, 법률 공장 정상 가동 중입니다!*
 `;
           } else if (lowerText.includes('31조') || lowerText.includes('기간') || lowerText.includes('갱신') || lowerText.includes('연장') || lowerText.includes('몇 년') || lowerText.includes('몇년')) {
             legalContent = `
-### 📅 국유재산법 제31조 / 제35조 (사용허가 및 대부기간) 핵심 가이드
+### 📅 국유재산법 제31조 / 제35조 (사용허가 및 사용허가(임차)기간) 핵심 가이드
 
 **1. 기본 계약 기간: 최초 5년**
-- 국유재산법에 의거하여 토지와 건물의 일반적인 사용허가(행정재산) 및 대부계약(일반재산) 기간은 **최초 5년 이내**로 제한됩니다.
+- 국유재산법에 의거하여 토지와 건물의 일반적인 사용허가(행정재산) 및 사용허가(임차)계약(일반재산) 기간은 **최초 5년 이내**로 제한됩니다.
 
 **2. 갱신 혜택 및 장기 운영 보장 (최장 10년)**
-- **1회 한정 5년 갱신:** 계약이 만료되기 전에 대부료 체납이 없고 사용 목적에 변함이 없다면, **1회에 한해 최대 5년을 추가로 연장(갱신)**할 수 있습니다. 
+- **1회 한정 5년 갱신:** 계약이 만료되기 전에 사용허가(임차)료 체납이 없고 사용 목적에 변함이 없다면, **1회에 한해 최대 5년을 추가로 연장(갱신)**할 수 있습니다. 
 - 따라서 **기본 10년(5년 + 5년)** 동안은 행정 소송이나 무단 회수 걱정 없이 장기적이고 안정적으로 창업이나 영농 터전을 보장받으실 수 있습니다.
 
-**3. 대부 기간 만료 후 재계약 룰**
+**3. 사용허가(임차) 기간 만료 후 재계약 룰**
 - 10년 만료 후에는 일반 입찰(경쟁 입찰)이 원칙이나, 영농 목적이거나 지자체 공간 복지 사업 연계 시 일정한 요건을 갖추면 수의계약 형태로 재계약을 타진할 수 있는 특별 조항이 있습니다!
 
-*💡 **쏭비서의 팁:** 계약 갱신 신청은 반드시 계약 만료 1개월 전까지 관할 지사에 신청서를 서면으로 접수하셔야 불이익이 없습니다. 대표님, 대부기간 타이머 정상 작동 중입니다!*
+*💡 **쏭비서의 팁:** 계약 갱신 신청은 반드시 계약 만료 1개월 전까지 관할 지사에 신청서를 서면으로 접수하셔야 불이익이 없습니다. 대표님, 사용허가(임차)기간 타이머 정상 작동 중입니다!*
 `;
-          } else if (lowerText.includes('32조') || lowerText.includes('요율') || lowerText.includes('임대료') || lowerText.includes('대부료') || lowerText.includes('감면') || lowerText.includes('요금') || lowerText.includes('계산') || lowerText.includes('34조')) {
+          } else if (lowerText.includes('32조') || lowerText.includes('요율') || lowerText.includes('임대료') || lowerText.includes('사용허가(임차)료') || lowerText.includes('감면') || lowerText.includes('요금') || lowerText.includes('계산') || lowerText.includes('34조')) {
             legalContent = `
-### 💰 국유재산법 제32조 / 제34조 (대부요율 및 감면 특례) 핵심 가이드
+### 💰 국유재산법 제32조 / 제34조 (사용허가(임차)요율 및 감면 특례) 핵심 가이드
 
-**1. 대부료 산정의 기본 원칙**
-- **대부료 = 재산 가액(개별공시지가 × 면적) × 대부요율(%)**
-- 대부요율은 국유재산의 목적과 용도에 따라 세분화되어 적용되며, 매년 법적으로 재산 가액이 재평가되어 대부료가 고정 또는 변동됩니다.
+**1. 사용허가(임차)료 산정의 기본 원칙**
+- **사용허가(임차)료 = 재산 가액(개별공시지가 × 면적) × 사용허가(임차)요율(%)**
+- 사용허가(임차)요율은 국유재산의 목적과 용도에 따라 세분화되어 적용되며, 매년 법적으로 재산 가액이 재평가되어 사용허가(임차)료가 고정 또는 변동됩니다.
 
-**2. 용도별 대부요율 및 특별 우대 감면**
+**2. 용도별 사용허가(임차)요율 및 특별 우대 감면**
 - **🚜 영농 및 경작용 (제1요율): 연 1.0% 이상** (예: 주말농장, 친환경 텃밭. 가장 강력한 우대 감면)
 - **🏢 소상공인 창업 및 상업용 공간 복지 특례: 연 3.0% 이상** (일반 상업 요율 5% 대비 40% 전격 감면 적용!)
 - **🏡 주거용 / 사회적 기업 공간 연계: 연 2.0% 이상**
 - **🚚 일반 용도 (야적장, 유료 주차장 등): 연 5.0% 이상**
 
-**3. 연간 대부료 인상 제한 (대부료 조정 제도)**
-- 당해 연도 대부료가 전년도 대비 급격히 상승하는 것을 방지하기 위해, 국유재산법 제33조에 의거하여 전년 대비 **연간 임대료 인상 폭은 최대 5% 이내**로 캡(Cap)이 씌워져 있어 안심하고 렌탈하셔도 됩니다!
+**3. 연간 사용허가(임차)료 인상 제한 (사용허가(임차)료 조정 제도)**
+- 당해 연도 사용허가(임차)료가 전년도 대비 급격히 상승하는 것을 방지하기 위해, 국유재산법 제33조에 의거하여 전년 대비 **연간 임대료 인상 폭은 최대 5% 이내**로 캡(Cap)이 씌워져 있어 안심하고 렌탈하셔도 됩니다!
 
 *💡 **쏭비서의 팁:** 랜드버디를 통해 창업(푸드트럭 등)을 신청하시면 공단 담당관에게 3% 우대 요율을 자동으로 적용해 달라고 행정 서식에 표기해 드립니다! 대표님, 임대 계산기 오차 없이 정상 가동 중입니다!*
 `;
@@ -442,16 +442,16 @@ ${logs.join('\n')}
 ### 🚨 국유재산법 제72조 (무단점유 변상금 징수) 및 벌칙 경고
 
 **1. 무단 점유의 정의**
-- 국유재산법에 따른 정당한 대부계약이나 사용허가 없이 국유재산을 임의로 사용하거나 점유(예: 불법 주차, 컨테이너 무단 방치, 경작 등)하는 행위를 의미합니다.
+- 국유재산법에 따른 정당한 사용허가(임차)계약이나 사용허가 없이 국유재산을 임의로 사용하거나 점유(예: 불법 주차, 컨테이너 무단 방치, 경작 등)하는 행위를 의미합니다.
 
 **2. 변상금 폭탄 규정 (일반 임대료의 120% 부과)**
-- 무단 점유 행위가 공단 순찰 및 지상 실사에서 적발될 경우, 국유재산법 제72조에 의거하여 정당 대부료의 **120%에 상당하는 '변상금'**이 강제 징수됩니다.
+- 무단 점유 행위가 공단 순찰 및 지상 실사에서 적발될 경우, 국유재산법 제72조에 의거하여 정당 사용허가(임차)료의 **120%에 상당하는 '변상금'**이 강제 징수됩니다.
 - 체납 시에는 **연 5%의 가산금**이 계속 가산되며, 공단의 독촉 후에도 미납 시 재산 압류 및 강제 추징이 개시됩니다.
 
 **3. 원상회복 및 행정대집행 대상**
 - 벌칙 변상금 부과와 별개로, 공단은 행정대집행법에 따라 무단 설치물(가설물, 주차 펜스 등)을 **즉각 강제 철거**할 수 있으며, 이로 발생하는 모든 대집행 비용도 무단점유자에게 청구됩니다.
 
-*💡 **쏭비서의 팁:** "잠깐 주차하는 건데 괜찮겠지" 하다가 위성 사진이나 순찰 드론에 촬영되어 수백만 원의 변상금 고지서를 받는 민원인이 매년 속출합니다! 반드시 랜드버디를 통해 합법적 대부 계약을 체결해 주세요. 대표님, 순찰 경보음 정상 가동 중입니다!*
+*💡 **쏭비서의 팁:** "잠깐 주차하는 건데 괜찮겠지" 하다가 위성 사진이나 순찰 드론에 촬영되어 수백만 원의 변상금 고지서를 받는 민원인이 매년 속출합니다! 반드시 랜드버디를 통해 합법적 사용허가(임차) 계약을 체결해 주세요. 대표님, 순찰 경보음 정상 가동 중입니다!*
 `;
           } else if (lowerText.includes('보호구역') || lowerText.includes('보호지구') || lowerText.includes('철도보호') || lowerText.includes('안전') || lowerText.includes('30m') || lowerText.includes('35m')) {
             legalContent = `
@@ -465,7 +465,7 @@ ${logs.join('\n')}
 - 만약 신고 없이 임의로 굴착하거나 위험물을 적치할 경우, 철도안전법에 의거 **2년 이하의 징역 또는 2천만 원 이하의 벌금**에 처해질 수 있습니다.
 
 **3. 랜드버디의 안전 케어 서비스**
-- 랜드버디에 등록된 철도 유휴지 중 **KR-001(대전역), KR-003(조치원)** 등은 일부 필지가 철도보호지구에 속해 있습니다. 하지만 걱정 마세요! 랜드버디가 안전 반경 35m를 지도 상에 실시간 빨간 점선으로 시각화해 드리고, 필요한 철도 행위신고 서류 초안도 자동 완성하여 대부 접수 시 함께 처리해 드립니다!
+- 랜드버디에 등록된 철도 유휴지 중 **KR-001(대전역), KR-003(조치원)** 등은 일부 필지가 철도보호지구에 속해 있습니다. 하지만 걱정 마세요! 랜드버디가 안전 반경 35m를 지도 상에 실시간 빨간 점선으로 시각화해 드리고, 필요한 철도 행위신고 서류 초안도 자동 완성하여 사용허가(임차) 접수 시 함께 처리해 드립니다!
 
 *💡 **쏭비서의 팁:** 열차 진동이나 고압 전선으로 인해 선로 인근 10m 안쪽에는 절대로 무거운 고정식 가설물을 설치해서는 안 됩니다. 대표님, 안전 경계선 감시 레이더 정상 가동 중입니다!*
 `;
@@ -474,33 +474,33 @@ ${logs.join('\n')}
             legalContent = `
 ### 🎓 대한민국 국유재산법 핵심 조항 종합 브리핑
 
-대한민국 국유재산법(State Property Act)은 국가의 소중한 재산(토지, 건물 등)을 효율적으로 보존하고 대부/활용하기 위한 법적 대원칙입니다. 랜드버디가 가장 많이 문의하시는 4대 조항을 일목요연하게 정리해 드립니다!
+대한민국 국유재산법(State Property Act)은 국가의 소중한 재산(토지, 건물 등)을 효율적으로 보존하고 사용허가(임차)/활용하기 위한 법적 대원칙입니다. 랜드버디가 가장 많이 문의하시는 4대 조항을 일목요연하게 정리해 드립니다!
 
 ---
 
 **1. 🏗️ 제18조 (영구시설물 축조 금지)**
 - 국유재산에는 단단한 콘크리트 빌딩 등의 영구시설물을 짓지 못하는 것이 원칙입니다.
-- **해결책:** 해체 및 견인이 용이한 **이동식 가설건축물(컨테이너, 조립식 펜스, 임시 천막)** 형태로 설계하시면 공단의 대부 승인이 신속하게 가용합니다!
+- **해결책:** 해체 및 견인이 용이한 **이동식 가설건축물(컨테이너, 조립식 펜스, 임시 천막)** 형태로 설계하시면 공단의 사용허가(임차) 승인이 신속하게 가용합니다!
 
-**2. 📅 제31조 / 제35조 (대부 및 사용허가 기간)**
-- 국유지 대부계약 기간은 **최초 5년**이 기본입니다.
+**2. 📅 제31조 / 제35조 (사용허가(임차) 및 사용허가 기간)**
+- 국유지 사용허가(임차)계약 기간은 **최초 5년**이 기본입니다.
 - **연장 혜택:** 계약 준수 시 **1회에 한해 5년 추가 연장이 보장되어 최장 10년**간 이사나 명도 소송 걱정 없이 내 땅처럼 안심 운영이 가능합니다.
 
-**3. 💰 제32조 / 제34조 (대부요율 및 특별 감면)**
+**3. 💰 제32조 / 제34조 (사용허가(임차)요율 및 특별 감면)**
 - 연간 임대료는 공시지가 대비 **일반 용도는 연 5.0% 이상**이 기준입니다.
 - **특별 우대:** **농업 및 텃밭 경작은 연 1.0% 이상**, **소상공인 청년 창업 공간은 연 3.0% 이상**으로 대폭 경감 혜택이 적용됩니다.
 
 **4. 🚨 제72조 (무단점유 변상금 징수)**
-- 대부 계약 없이 국유지를 무단으로 점용할 경우, 정상 임대료의 **120%에 상당하는 '벌칙 변상금'**이 매년 소급 부과되며 강제 행정대집행 철거 대상이 됩니다.
+- 사용허가(임차) 계약 없이 국유지를 무단으로 점용할 경우, 정상 임대료의 **120%에 상당하는 '벌칙 변상금'**이 매년 소급 부과되며 강제 행정대집행 철거 대상이 됩니다.
 
 ---
 
-*💡 **쏭비서의 팁:** 랜드버디의 모든 매칭 필지 시뮬레이터는 이 4대 법적 잣대를 AI 알고리즘으로 자동 연산하여 적합성과 추천 점수를 정확하게 산출합니다. 궁금한 조항(예: "제18조 가이드", "대부요율 할인 혜택")을 개별적으로 질문하시면 더 정밀한 원스톱 행정 자문을 받아보실 수 있습니다. 대표님, 법령 오케스트레이션 정상 가동 중입니다!*
+*💡 **쏭비서의 팁:** 랜드버디의 모든 매칭 필지 시뮬레이터는 이 4대 법적 잣대를 AI 알고리즘으로 자동 연산하여 적합성과 추천 점수를 정확하게 산출합니다. 궁금한 조항(예: "제18조 가이드", "사용허가(임차)요율 할인 혜택")을 개별적으로 질문하시면 더 정밀한 원스톱 행정 자문을 받아보실 수 있습니다. 대표님, 법령 오케스트레이션 정상 가동 중입니다!*
 `;
           }
           
           replyText = `⚖️ **[쏭비서 법률 행정 통역 가동 완료 (데모 모드)]** 
-국토교통부 및 공단 법무 지원실의 국유재산 대부 행정 가이드라인을 분석하여 민원인 눈높이에 맞춤 해설을 조립했습니다.
+국토교통부 및 공단 법무 지원실의 국유재산 사용허가(임차) 행정 가이드라인을 분석하여 민원인 눈높이에 맞춤 해설을 조립했습니다.
 
 ${legalContent}`;
         } else if (assembledParcel) {
@@ -526,16 +526,16 @@ ${logs.join('\n')}
             const hasEnoughArea = parcel.area >= 300;
             step3Summary1 = `🦮 **[적합성 판정]** 야외 반려견 놀이터 공간으로 **적합(추천 점수: ${hasEnoughArea ? '90점' : '75점'})**합니다. (부지 면적 ${parcel.area}㎡로 ${hasEnoughArea ? '소/대형견 분리 운영 기준 300㎡ 충족' : '대형견/소형견 분리 면적 300㎡ 기준 미달하여 소형견 전용 권장'})`;
             step3Summary2 = `💰 **[장점/렌탈비]** 탁 트인 야외 유휴지를 월 ${monthlyFee.toLocaleString()}원이라는 독보적인 임대 조건으로 확보하여 댕댕이들의 안전한 놀이 공간으로 자립 운영할 수 있습니다.`;
-            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조에 의거, 탈부착이 쉬운 안전 펜스(가설물) 형태로 배치도를 설계하시면 영구물 금지 조항을 우회할 수 있으며 동법 제31조에 따라 최초 5년(최장 10년) 대부 혜택을 획득합니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조에 의거, 탈부착이 쉬운 안전 펜스(가설물) 형태로 배치도를 설계하시면 영구물 금지 조항을 우회할 수 있으며 동법 제31조에 따라 최초 5년(최장 10년) 사용허가(임차) 혜택을 획득합니다.`;
           } else if (userPurpose === "푸드트럭") {
             step3Summary1 = `🚚 **[적합성 판정]** 소상공인 푸드트럭 창업 및 모바일 F&B 부지로 **최상(추천 점수: 98점)**입니다. 도로 접해성과 진입로가 매우 훌륭합니다.`;
-            step3Summary2 = `💰 **[장점/렌탈비]** 초역세권 유동인구 노다지 땅을 연간 약 ${yearlyFee.toLocaleString()}원의 특별우대 상업 대부 요율로 선점하여 창업 초기 고정비 부담을 획기적으로 낮출 수 있습니다.`;
+            step3Summary2 = `💰 **[장점/렌탈비]** 초역세권 유동인구 노다지 땅을 연간 약 ${yearlyFee.toLocaleString()}원의 특별우대 상업 사용허가(임차) 요율로 선점하여 창업 초기 고정비 부담을 획기적으로 낮출 수 있습니다.`;
             step3Summary3 = `⚖️ **[행정 팁]** 이동식 차량 및 가설 천막은 국유재산법 제18조 영구건축물 축조 금지 룰에 전혀 저촉되지 않아 최단기에 승인되며, 동법 제31조/제35조에 따라 최초 5년간 든든한 상업 계약이 법장 보장됩니다.`;
           } else {
             // 프리셋 외 용도 (대원칙 가이드 작동)
             step3Summary1 = `🔍 **[적합성 판정]** 신청 용도 '${userPurpose}'에 대한 국유지 매칭 분석 결과 **보통(추천 점수: 80점)**입니다.`;
             step3Summary2 = `💰 **[장점/렌탈비]** 지적도 및 공시지가 시뮬레이션 결과 연 렌탈비 ${yearlyFee.toLocaleString()}원으로 저렴하게 공간 자립을 시작할 수 있는 최적의 기반을 제공합니다.`;
-            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조(영구건축물 축조 금지)에 의거하여 단단한 콘크리트 빌딩 등의 구축은 불가하므로 가설건축물 형태로 유연하게 대안 설계도를 준비하셔야 동법 제31조(5년 한도 대부) 승인을 얻습니다.`;
+            step3Summary3 = `⚖️ **[행정 팁]** 국유재산법 제18조(영구건축물 축조 금지)에 의거하여 단단한 콘크리트 빌딩 등의 구축은 불가하므로 가설건축물 형태로 유연하게 대안 설계도를 준비하셔야 동법 제31조(5년 한도 사용허가(임차)) 승인을 얻습니다.`;
           }
 
           replyText = terminalLogs + `요청하신 용도와 목적에 맞추어 **국토교통부 표준 및 공간정보 연계 API**의 데이터를 실시간 조립하여 최고의 철도 유휴부지 매칭 결과를 도출했습니다.
@@ -549,9 +549,9 @@ ${logs.join('\n')}
 
 ### 📋 1단계 (규제/비용 조립 결과)
 - **국토교통부 토지이용계획 규제 분석:**
-  이 땅은 현재 **'${parcel.zoning}'** 지역에 속해 있습니다. ${parcel.isRailwayProtected ? '⚠️ **철도보호지구 저촉구역**에 편입되어 있어 임시 가설 건축물(푸드트럭, 가설창고 등)을 거치할 시 공단에 사전 안전 행위신고 절차가 가볍게 수반됩니다. (시민분들을 위해 어려운 행정 신고서 서류는 제가 대신 자동 인쇄해 드립니다!)' : '✅ 철도 특별보호지구 구역 외로, 행정 행위 허가 절차 없이 즉각 대부가 가용합니다.'}
+  이 땅은 현재 **'${parcel.zoning}'** 지역에 속해 있습니다. ${parcel.isRailwayProtected ? '⚠️ **철도보호지구 저촉구역**에 편입되어 있어 임시 가설 건축물(푸드트럭, 가설창고 등)을 거치할 시 공단에 사전 안전 행위신고 절차가 가볍게 수반됩니다. (시민분들을 위해 어려운 행정 신고서 서류는 제가 대신 자동 인쇄해 드립니다!)' : '✅ 철도 특별보호지구 구역 외로, 행정 행위 허가 절차 없이 즉각 사용허가(임차)가 가용합니다.'}
 - **개별공시지가 기반 임대료 시뮬레이션:**
-  올해 공시지가 **${parcel.officialPrice.toLocaleString()}원/㎡** 및 대부요율 **${ratePct}%**를 곱해 산출한 예상 연간 대부료는 다음과 같습니다.
+  올해 공시지가 **${parcel.officialPrice.toLocaleString()}원/㎡** 및 사용허가(임차)요율 **${ratePct}%**를 곱해 산출한 예상 연간 사용허가(임차)료는 다음과 같습니다.
   * 계산 산식: ${parcel.area.toLocaleString()}㎡ (면적) × ${parcel.officialPrice.toLocaleString()}원 (지가) × ${ratePct}% (특별우대요율)
   * **연간 예상 렌탈비:** **약 ${yearlyFee.toLocaleString()}원** (월 환산 기준 약 ${monthlyFee.toLocaleString()}원)
 
@@ -645,7 +645,7 @@ ${logs.join('\n')}
       const botMsg: LandBuddyMessage = {
         id: `msg-${Date.now()}-update-name`,
         sender: 'bot',
-        text: `👍 신청인 정보가 **'${applicantName}' (${applicantType})** 님으로 성공적으로 입력/수정되었습니다! 국유재산 대부 신청서 초안이 실시간으로 갱신되었습니다. 아래 신청 버튼을 누르시면 바로 공간복지 접수처로 서류가 전송됩니다.`,
+        text: `👍 신청인 정보가 **'${applicantName}' (${applicantType})** 님으로 성공적으로 입력/수정되었습니다! 국유재산 사용허가(임차) 신청서 초안이 실시간으로 갱신되었습니다. 아래 신청 버튼을 누르시면 바로 공간복지 접수처로 서류가 전송됩니다.`,
         timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
         actionCard: {
           type: 'recommend',
@@ -670,7 +670,7 @@ ${logs.join('\n')}
     }
   };
 
-  // 실제 대부 신청서 접수 액션
+  // 실제 사용허가(임차) 신청서 접수 액션
   const handleApplyFinal = (parcel: LandParcel) => {
     if (!applicantName) {
       setPendingParcel(parcel);
@@ -702,7 +702,7 @@ ${logs.join('\n')}
         { name: 'Applicant_Credentials_Verify.pdf', size: '512 KB', type: 'PDF' }
       ],
       timeline: [
-        { status: '신청서 제출', date: new Date().toLocaleString('ko-KR'), description: `K-Rail Land-Buddy 챗봇 비서를 통해 ${applicantName}님의 대부 신청서가 정상 접수되었습니다.`, actor: '민원인' },
+        { status: '신청서 제출', date: new Date().toLocaleString('ko-KR'), description: `K-Rail Land-Buddy 챗봇 비서를 통해 ${applicantName}님의 사용허가(임차) 신청서가 정상 접수되었습니다.`, actor: '민원인' },
         { status: '시스템 서류 검증', date: new Date().toLocaleString('ko-KR'), description: '스마트 공간 복지 자동 정합 검증 통과 완료.', actor: '시스템' }
       ]
     };
@@ -712,15 +712,15 @@ ${logs.join('\n')}
     const botConfirm: LandBuddyMessage = {
       id: `msg-${Date.now()}-apply-success`,
       sender: 'bot',
-      text: `🎉 축하합니다! **${parcel.id} (${parcel.address.split('(')[0].trim()})** 부지에 대한 **공간 복지 대부 신청**이 정식으로 접수되었습니다! 
+      text: `🎉 축하합니다! **${parcel.id} (${parcel.address.split('(')[0].trim()})** 부지에 대한 **공간 복지 사용허가(임차) 신청**이 정식으로 접수되었습니다! 
 
 **[접수 내역 안내]**
 - **정식 신청 번호:** ${newApp.id}
 - **신청 신청인:** ${applicantName} (${applicantType})
-- **대부 희망 기간:** ${selectedLeasePeriod}개월
+- **사용허가(임차) 희망 기간:** ${selectedLeasePeriod}개월
 - **연간 임대 금액:** 약 ${yearlyFee.toLocaleString()}원
 
-상단의 **'📋 대부 신청 심사'** 탭이나 **'📊 성과 대시보드'**에서 실시간 접수 현황 및 심사 타임라인 단계(접수완료 ➡️ 실사 ➡️ 최종 승인)를 확인하실 수 있습니다. 서류 승인 시 등록하신 모바일 연락처로 안전 계약 링크가 즉시 통보됩니다!`,
+상단의 **'📋 사용허가(임차) 신청 심사'** 탭이나 **'📊 성과 대시보드'**에서 실시간 접수 현황 및 심사 타임라인 단계(접수완료 ➡️ 실사 ➡️ 최종 승인)를 확인하실 수 있습니다. 서류 승인 시 등록하신 모바일 연락처로 안전 계약 링크가 즉시 통보됩니다!`,
       timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
     };
     setMessages(prev => [...prev, botConfirm]);
@@ -731,7 +731,7 @@ ${logs.join('\n')}
     const { yearlyFee, monthlyFee, ratePct } = calculateLeaseFee(parcel);
     const printContent = `
 ========================================
-    [국유재산 대부 신청서 임시 서식]
+    [국유재산 사용허가(임차) 신청서 임시 서식]
         K-Rail Land-Buddy 자동발급
 ========================================
 1. 신청인 인적사항
@@ -740,17 +740,17 @@ ${logs.join('\n')}
  - 대 부 부 지 번 호: ${parcel.id}
  - 소 재 지: ${parcel.address}
 
-2. 대부 목적 및 면적
+2. 사용허가(임차) 목적 및 면적
  - 사 용 목 적: ${parcel.recommendedUse}
- - 대부 신청 면적: ${parcel.area} ㎡
+ - 사용허가(임차) 신청 면적: ${parcel.area} ㎡
  - 지 목: ${parcel.landType}
 
-3. 대부료 및 대부 기간
+3. 사용허가(임차)료 및 사용허가(임차) 기간
  - 단가 (공시지가): ${parcel.officialPrice.toLocaleString()} 원/㎡
- - 대부 기간 (희망): ${selectedLeasePeriod}개월
- - 대부요율 가이드: ${ratePct}% 적용
- - 연간 예상 대부료: ${yearlyFee.toLocaleString()} 원
- - 월별 환산 대부료: 약 ${monthlyFee.toLocaleString()} 원/월
+ - 사용허가(임차) 기간 (희망): ${selectedLeasePeriod}개월
+ - 사용허가(임차)요율 가이드: ${ratePct}% 적용
+ - 연간 예상 사용허가(임차)료: ${yearlyFee.toLocaleString()} 원
+ - 월별 환산 사용허가(임차)료: 약 ${monthlyFee.toLocaleString()} 원/월
 
 4. 특기사항 및 규제해소
  - 보안/안전 유의사항: ${parcel.restrictions}
@@ -764,7 +764,7 @@ ${logs.join('\n')}
     const element = document.createElement("a");
     const file = new Blob([printContent], {type: 'text/plain;charset=utf-8'});
     element.href = URL.createObjectURL(file);
-    element.download = `${parcel.id}_대부신청서_초안_${applicantName || '무명'}.txt`;
+    element.download = `${parcel.id}_사용허가(임차)신청서_초안_${applicantName || '무명'}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -772,7 +772,7 @@ ${logs.join('\n')}
     const printMsg: LandBuddyMessage = {
       id: `msg-${Date.now()}-download-success`,
       sender: 'bot',
-      text: `📥 **${parcel.id}_대부신청서_초안.txt** 파일 다운로드가 완료되었습니다! 소지하신 행정서류와 함께 공단 관할 지사(혹은 온라인 청약홈)에 제출할 수 있는 정형 텍스트 초안입니다.`,
+      text: `📥 **${parcel.id}_사용허가(임차)신청서_초안.txt** 파일 다운로드가 완료되었습니다! 소지하신 행정서류와 함께 공단 관할 지사(혹은 온라인 청약홈)에 제출할 수 있는 정형 텍스트 초안입니다.`,
       timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
     };
     setMessages(prev => [...prev, printMsg]);
@@ -920,7 +920,7 @@ ${logs.join('\n')}
           )}
         </AnimatePresence>
 
-        {/* 상단 퀵 정보 컨테이너 (시민 맞춤형 대부신청인 상태바) */}
+        {/* 상단 퀵 정보 컨테이너 (시민 맞춤형 사용허가(임차)신청인 상태바) */}
         <div className="bg-[#f0f4f8]/80 backdrop-blur-xs px-4 py-3 flex items-center justify-between border-b border-gray-150" id="applicant_status_bar">
           <div className="flex items-center gap-2 text-xs text-gray-700">
             <User className="w-4 h-4 text-[#00529C]" />
@@ -1058,7 +1058,7 @@ ${logs.join('\n')}
                       <div className="p-4 bg-brand-blue-light/50 border-b border-gray-100">
                         <div className="flex items-center gap-1.5 text-sm font-bold text-gray-950 mb-3">
                           <Calculator className="w-4 h-4 text-brand-green" />
-                          <span>예상 대부료 상세 시뮬레이션</span>
+                          <span>예상 사용허가(임차)료 상세 시뮬레이션</span>
                         </div>
 
                         {/* 산출 공식 */}
@@ -1070,12 +1070,12 @@ ${logs.join('\n')}
                             {msg.actionCard.parcel.area}㎡ × {msg.actionCard.parcel.officialPrice.toLocaleString()}원 × {getRateAndLabel(msg.actionCard.parcel.recommendedUse).ratePct}%
                           </div>
                           <div className="flex justify-between text-[11px] text-gray-505 font-medium">
-                            <span>대부요율 가이드</span>
+                            <span>사용허가(임차)요율 가이드</span>
                             <span className="font-extrabold text-brand-green">익년 특별 {getRateAndLabel(msg.actionCard.parcel.recommendedUse).ratePct}% 특별우대 ({getRateAndLabel(msg.actionCard.parcel.recommendedUse).label})</span>
                           </div>
                         </div>
 
-                        {/* 연간 대부료 최종 */}
+                        {/* 연간 사용허가(임차)료 최종 */}
                         <div className="mt-3 bg-brand-green-light border border-emerald-100 rounded-xl p-3.5 font-sans text-center">
                           <div className="text-brand-green text-[10.5px] font-bold tracking-wider">FINAL ESTIMATED PRICE</div>
                           <div className="text-brand-green-deep font-extrabold text-xl my-1">
@@ -1087,21 +1087,21 @@ ${logs.join('\n')}
                         </div>
                       </div>
 
-                      {/* 3단계: 📝 국유재산 대부 신청서 자동 초안 생성 */}
+                      {/* 3단계: 📝 국유재산 사용허가(임차) 신청서 자동 초안 생성 */}
                       <div className="p-4 space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5 text-sm font-bold text-gray-900">
                             <FileText className="w-4 h-4 text-[#00529C]" />
-                            <span>국유재산 대부 신청서 자동 초안</span>
+                            <span>국유재산 사용허가(임차) 신청서 자동 초안</span>
                           </div>
                           <span className="text-[10px] bg-[#E1F0FF] text-[#00529C] px-2 py-0.5 rounded-full font-bold">
                             정합성 100% 통과
                           </span>
                         </div>
 
-                        {/* 대부 기간 셀렉터 */}
+                        {/* 사용허가(임차) 기간 셀렉터 */}
                         <div className="flex items-center justify-between text-xs bg-gray-50 p-2 rounded-lg border border-gray-100">
-                          <span className="text-gray-600 font-medium">희망 대부 기간 설정:</span>
+                          <span className="text-gray-600 font-medium">희망 사용허가(임차) 기간 설정:</span>
                           <select 
                             value={selectedLeasePeriod}
                             onChange={(e) => {
@@ -1151,11 +1151,11 @@ ${logs.join('\n')}
                               <tr>
                                 <td className="p-2 font-medium text-gray-500 bg-gray-50/50">사업 목적</td>
                                 <td className="p-2 font-sans font-medium text-gray-700 break-all leading-tight">
-                                  {msg.actionCard.parcel.recommendedUse.split('·')[0]} 공간 대부
+                                  {msg.actionCard.parcel.recommendedUse.split('·')[0]} 공간 사용허가(임차)
                                 </td>
                               </tr>
                               <tr>
-                                <td className="p-2 font-medium text-gray-500 bg-gray-50/50">희망 대부기간</td>
+                                <td className="p-2 font-medium text-gray-500 bg-gray-50/50">희망 사용허가(임차)기간</td>
                                 <td className="p-2 font-mono text-gray-700">
                                   {selectedLeasePeriod}개월 ({Math.round(selectedLeasePeriod / 12 * 10) / 10}년)
                                 </td>
@@ -1170,7 +1170,7 @@ ${logs.join('\n')}
                             <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                             <div>
                               <span className="font-bold">신청인 정보가 아직 완성되지 않았습니다!</span><br />
-                              성함을 입력해 주시면 대부 신청 표 양식에 즉각 반영되어 공단 서버로 정식 접수가 진행됩니다.
+                              성함을 입력해 주시면 사용허가(임차) 신청 표 양식에 즉각 반영되어 공단 서버로 정식 접수가 진행됩니다.
                             </div>
                           </div>
                         )}
@@ -1193,7 +1193,7 @@ ${logs.join('\n')}
                               id="btn_chat_apply_rent"
                             >
                               <Check className="w-4 h-4" />
-                              공간복지 즉시 대부신청
+                              공간복지 즉시 사용허가(임차)신청
                             </button>
                           )}
 
@@ -1248,7 +1248,7 @@ ${logs.join('\n')}
             </button>
           </form>
           <p className="text-[10px] text-gray-400 text-center mt-2 font-sans leading-none">
-            철도 가용 부지 마스터 AI 대화 알고리즘 • 대부 요율 (농업 1% / 창업 3% / 일반 5% 반영)
+            철도 가용 부지 마스터 AI 대화 알고리즘 • 사용허가(임차) 요율 (농업 1% / 창업 3% / 일반 5% 반영)
           </p>
         </div>
       </div>
@@ -1285,7 +1285,7 @@ ${logs.join('\n')}
             </div>
           </div>
 
-          {/* 랜드버디 국유재산 대부 꿀팁 가이드 */}
+          {/* 랜드버디 국유재산 사용허가(임차) 꿀팁 가이드 */}
           <div className="bg-gradient-to-br from-[#00529C] to-blue-900 rounded-2xl p-5 text-white space-y-4 shadow-sm" id="regulatory_quick_guide">
             <div className="flex items-center gap-2">
               <HelpCircle className="w-5 h-5 text-[#FFC107] animate-bounce" />
@@ -1295,17 +1295,17 @@ ${logs.join('\n')}
             <div className="space-y-3.5 text-xs text-blue-100/90 leading-relaxed font-sans" id="guide_item_list">
               <div className="bg-white/10 p-3 rounded-xl border border-white/15">
                 <strong className="text-[#FFC107] block mb-1">Q. 무단 점유는 어떻게 되나요?</strong>
-                철도공단의 허가 없이 철도보호구역이나 철도부지를 점용하면 벌칙금(변상금 120%) 부과 및 고발 조치됩니다! 랜드버디를 통해 정당하고 안전하게 대부 신청하십시오.
+                철도공단의 허가 없이 철도보호구역이나 철도부지를 점용하면 벌칙금(변상금 120%) 부과 및 고발 조치됩니다! 랜드버디를 통해 정당하고 안전하게 사용허가(임차) 신청하십시오.
               </div>
 
               <div className="bg-white/10 p-3 rounded-xl border border-white/15">
-                <strong className="text-emerald-300 block mb-1">Q. 대부료 우대 혜택 적용 방법은?</strong>
+                <strong className="text-emerald-300 block mb-1">Q. 사용허가(임차)료 우대 혜택 적용 방법은?</strong>
                 일반 부지는 공시지가의 5%이지만, 농사 목적(주말농장 등)은 1%, 카페나 푸드트럭 창업 등 지역밀착 공간복지는 **익년 한시 특별 우대요율인 3%**로 전격 낮추어 드립니다.
               </div>
 
               <div className="bg-white/10 p-3 rounded-xl border border-white/15">
                 <strong className="text-sky-300 block mb-1">Q. 신청 시 준비 서류는?</strong>
-                랜드버디가 자동 생성 및 다운로드해 드리는 **'국유재산 대부 신청서 초안.txt'**와 주민등록등본(개인) 또는 사업자등록증명원(기업)만 지참하시면 영농 및 소상공인 공간 복지 안전 심사를 빠르게 통과할 수 있습니다.
+                랜드버디가 자동 생성 및 다운로드해 드리는 **'국유재산 사용허가(임차) 신청서 초안.txt'**와 주민등록등본(개인) 또는 사업자등록증명원(기업)만 지참하시면 영농 및 소상공인 공간 복지 안전 심사를 빠르게 통과할 수 있습니다.
               </div>
             </div>
           </div>

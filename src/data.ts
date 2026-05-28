@@ -14,7 +14,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 500000,
     recommendedUse: '소상공인 창업·푸드트럭·팝업스토어',
     restrictions: '철도보호지구 행위신고 필요·역 광장 유동인구 최상',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '대전광역시',
     imageUrl: 'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80',
     latitude: 36.3325,
@@ -33,7 +33,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 80000,
     recommendedUse: '도시농업·주말농장·실버텃밭',
     restrictions: '진입로 확보 필요·인근 주민 소음 민원 완화 구역',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '대전광역시',
     imageUrl: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80',
     latitude: 36.3156,
@@ -52,7 +52,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 300000,
     recommendedUse: '청년창업 카페·야외 플리마켓·로컬 공방',
     restrictions: '역사 리모델링 구간 인접으로 유동인구 증가 추세',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '세종특별자치시',
     imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
     latitude: 36.5978,
@@ -90,7 +90,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 1200000,
     recommendedUse: '무인 보관함·도심 주차장·플리마켓',
     restrictions: '교량 하부 공간으로 높이 제약(4.5m) 있음·철도 보호 행위허가 필',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '서울특별시',
     imageUrl: 'https://images.unsplash.com/photo-1513828741544-cf6662767098?auto=format&fit=crop&w=600&q=80',
     latitude: 37.5285,
@@ -109,7 +109,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 650000,
     recommendedUse: '관광 팝업 스토어·자전거 보관 대여소·모바일 쉼터',
     restrictions: '안전 펜스 설치 필수·유동 관광 인구 밀접',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '부산광역시',
     imageUrl: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80',
     latitude: 35.1152,
@@ -128,7 +128,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 95000,
     recommendedUse: '친환경 주말농장·실버 도시텃밭',
     restrictions: '주민 복지 차원 우선 임대 권장 구역·용수 공급 시설 인접',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '대구광역시',
     imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80',
     latitude: 35.8856,
@@ -147,7 +147,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 280000,
     recommendedUse: '소상공인 테이크아웃 창업·야외 전시 공간',
     restrictions: '복합환승센터 인접으로 개발 진행 중·진입 편의성 양호',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '광주광역시',
     imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80',
     latitude: 35.1378,
@@ -166,7 +166,7 @@ export const LAND_PARCELS: LandParcel[] = [
     officialPrice: 150000,
     recommendedUse: '캠핑용품 보관·자전거 쉼터·야외 플리마켓',
     restrictions: '관광 시즌 유동인구 집중·소음 차단용 울타리 설치 권장',
-    status: '대부가능',
+    status: '사용허가(임차)가능',
     region: '강원특별자치도',
     imageUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=600&q=80',
     latitude: 37.7685,
@@ -253,7 +253,7 @@ export function mapRawJsonToParcels(rawJson: any[]): LandParcel[] {
       officialPrice: price,
       recommendedUse,
       restrictions,
-      status: '대부가능' as const,
+      status: '사용허가(임차)가능' as const,
       region: address.split(' ')[0] || '충청남도',
       imageUrl: images[seq % images.length],
       latitude: parseFloat((latBase + offsetLat).toFixed(6)),
@@ -314,7 +314,7 @@ export const INITIAL_APPLICATIONS: LeaseApplication[] = [
     timeline: [
       { status: '신청서 제출', date: '2026-04-15 11:00', description: '존 도 로지스틱스 대행인 제출', actor: '민원인' },
       { status: '현장 실사 완료', date: '2026-04-20 16:00', description: '열차 하중 검토 결과 진동 영향 미미함 확인', actor: '박동부 차장' },
-      { status: '대부 최종 승인', date: '2026-04-25 15:40', description: '연간 요율 5% 적용하여 계약서 발급 완료', actor: '국가철도공단 이사장' }
+      { status: '사용허가(임차) 최종 승인', date: '2026-04-25 15:40', description: '연간 요율 5% 적용하여 계약서 발급 완료', actor: '국가철도공단 이사장' }
     ]
   },
   {
@@ -335,7 +335,7 @@ export const INITIAL_APPLICATIONS: LeaseApplication[] = [
       { name: 'Eco_Farming_Proposal.pdf', size: '2.1 MB', type: 'PDF' }
     ],
     timeline: [
-      { status: '신청서 제출', date: '2026-05-25 13:02', description: '김영희 농부 주말농장 대부 신청 접수 완료', actor: '민원인' }
+      { status: '신청서 제출', date: '2026-05-25 13:02', description: '김영희 농부 주말농장 사용허가(임차) 신청 접수 완료', actor: '민원인' }
     ]
   },
   {
@@ -356,7 +356,7 @@ export const INITIAL_APPLICATIONS: LeaseApplication[] = [
       { name: 'FleaMarket_Layout.pdf', size: '5.0 MB', type: 'PDF' }
     ],
     timeline: [
-      { status: '신청서 제출', date: '2026-05-26 10:00', description: '청년마켓 대부 신청서 제출함', actor: '민원인' },
+      { status: '신청서 제출', date: '2026-05-26 10:00', description: '청년마켓 사용허가(임차) 신청서 제출함', actor: '민원인' },
       { status: '보완 요청 발급', date: '2026-05-27 10:30', description: '플리마켓 부스 배치도가 철도 선로 한계선(3m 이내)을 침범하여 배치를 재조정해 주십시오. (철도보호안전법 저촉 우려)', actor: '김철수 심사관' }
     ]
   }
@@ -399,7 +399,7 @@ export const LAND_BUDDY_PRESETS = [
   },
   {
     title: '🏠 부산역 인근 관광쉼터',
-    query: '부산역 근처 관광 특화 쉼터를 기획 중인데 대부 가능한 땅 추천 부탁해요.',
+    query: '부산역 근처 관광 특화 쉼터를 기획 중인데 사용허가(임차) 가능한 땅 추천 부탁해요.',
     targetId: 'KR-006'
   }
 ];

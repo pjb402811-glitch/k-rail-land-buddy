@@ -60,7 +60,7 @@ export default function App() {
           // 옛날 데이터(appliedDate가 없거나 structure가 깨진 것) 감지 시, 구버전은 비우고 최신 데이터로 복원
           const hasOutdated = parsed.some(app => !app || !app.id || !app.appliedDate || typeof app.monthlyFee !== 'number');
           if (hasOutdated) {
-            console.warn('구버전 대부 신청서 데이터 포맷 감지. 강제 마이그레이션을 위해 초기화합니다.');
+            console.warn('구버전 사용허가(임차) 신청서 데이터 포맷 감지. 강제 마이그레이션을 위해 초기화합니다.');
             localStorage.removeItem('k_rail_land_buddy_apps');
             return INITIAL_APPLICATIONS;
           }
@@ -136,7 +136,7 @@ export default function App() {
     setParcels(prev => [...newParcels, ...prev]);
   };
 
-  // 대부 신청 접수 콜백
+  // 사용허가(임차) 신청 접수 콜백
   const handleApplySubmit = (newApp: LeaseApplication) => {
     setApplications((prev) => [newApp, ...prev]);
     setSelectedReviewAppId(newApp.id);
@@ -324,7 +324,7 @@ export default function App() {
               id="user_tab_guide"
             >
               <BookOpen className="w-4 h-4 text-brand-green" />
-              <span>📚 대부 절차 행정 가이드</span>
+              <span>📚 사용허가(임차) 절차 행정 가이드</span>
             </button>
           </div>
 
@@ -412,7 +412,7 @@ export default function App() {
                 </h2>
                 <p className="text-xs md:text-sm text-blue-100 max-w-2xl font-sans leading-relaxed">
                   국가철도공단 및 캠코(온비드) 연동 국유재산 행정 전용 백오피스입니다. 
-                  시민들이 모바일 챗봇으로 실시간 신청한 대부 계약 신청서를 교차 심사하고, 엑셀 및 PDF 공고문을 즉시 파싱 업로드할 수 있습니다.
+                  시민들이 모바일 챗봇으로 실시간 신청한 사용허가(임차) 계약 신청서를 교차 심사하고, 엑셀 및 PDF 공고문을 즉시 파싱 업로드할 수 있습니다.
                 </p>
               </div>
               <div className="flex bg-white/10 border border-white/20 px-4 py-3 rounded-2xl text-xs font-mono shrink-0 items-center gap-3 backdrop-blur-md">
@@ -448,7 +448,7 @@ export default function App() {
               }`}
               id="admin_tab_review"
             >
-              <span>📋 대부 신청 심사</span>
+              <span>📋 사용허가(임차) 신청 심사</span>
               {applications.filter(a => a.status === '심사중').length > 0 && (
                 <span className="bg-rose-500 text-white font-mono text-[9px] px-2 py-0.5 rounded-full font-bold animate-pulse shadow-sm">
                   {applications.filter(a => a.status === '심사중').length}
@@ -547,7 +547,7 @@ export default function App() {
         <div className="bg-amber-50/50 backdrop-blur-md border border-amber-250/30 rounded-2xl p-4.5 flex items-center justify-center gap-3 text-amber-950 text-[11px] font-semibold leading-relaxed shadow-3xs max-w-4xl mx-auto text-left sm:text-center">
           <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 animate-pulse" />
           <span>
-            <strong>행정 보안 및 실시간 주의사항:</strong> 랜드버디는 표준 공공 데이터 연계를 기반으로 운영됩니다. 실제 대부 인가 및 인접 선로 안전 확인을 위해 관할 철도공단 지사 및 담당 지자체와 교차 협의를 거치십시오.
+            <strong>행정 보안 및 실시간 주의사항:</strong> 랜드버디는 표준 공공 데이터 연계를 기반으로 운영됩니다. 실제 사용허가(임차) 인가 및 인접 선로 안전 확인을 위해 관할 철도공단 지사 및 담당 지자체와 교차 협의를 거치십시오.
           </span>
         </div>
       </div>
@@ -569,7 +569,7 @@ export default function App() {
               <div className="space-y-2">
                 <h3 className="font-sans font-black text-gray-950 text-xl tracking-tight">🔒 관리자 행정 포털 보안 인증</h3>
                 <p className="text-xs text-gray-500 leading-relaxed font-sans px-2">
-                  이 시스템은 국가철도공단 대부 신청 및 공간복지 심사 행정 전용 영역입니다. 
+                  이 시스템은 국가철도공단 사용허가(임차) 신청 및 공간복지 심사 행정 전용 영역입니다. 
                   진입을 위해 비밀번호 **4자리**를 입력해 주십시오. (기본 비밀번호: 1111)
                 </p>
               </div>

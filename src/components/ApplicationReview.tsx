@@ -40,11 +40,11 @@ export default function ApplicationReview({ applicationId, applications, onUpdat
   const handleAction = (status: '승인' | '보완요청' | '반려') => {
     let logMsg = '';
     if (status === '승인') {
-      logMsg = '국유재산 대부 적격성 및 철도안전보호구역 내 행점 적합성 심사를 만점으로 통과하였습니다. 대부 승인이 확정되었습니다.';
+      logMsg = '국유재산 사용허가(임차) 적격성 및 철도안전보호구역 내 행점 적합성 심사를 만점으로 통과하였습니다. 사용허가(임차) 승인이 확정되었습니다.';
     } else if (status === '보완요청') {
       logMsg = inputText.trim() || '첨부 부지 이용 계획서의 차량 진출입 조감도 및 철도방음벽 안전펜스 관련 치수 확인 서류의 보완이 필요합니다.';
     } else {
-      logMsg = inputText.trim() || '신청한 사업 목적이 선로보호법에 규정된 위험 임시저장 용도에 해당하므로 대부가 최종 반려 처리되었습니다.';
+      logMsg = inputText.trim() || '신청한 사업 목적이 선로보호법에 규정된 위험 임시저장 용도에 해당하므로 사용허가(임차)가 최종 반려 처리되었습니다.';
     }
 
     onUpdateStatus(currentApp.id, status, logMsg);
@@ -105,7 +105,7 @@ export default function ApplicationReview({ applicationId, applications, onUpdat
                 <p className="text-xs text-gray-500 font-medium mt-1">{currentApp.address}</p>
               </div>
               
-              {/* 월 대부료 우측 배너 */}
+              {/* 월 사용허가(임차)료 우측 배너 */}
               <div className="bg-gradient-to-br from-brand-green-light to-emerald-100/30 border border-brand-green/20 rounded-2xl p-4.5 text-right shadow-xs hover:shadow-sm transition-transform duration-300">
                 <span className="text-[10px] font-extrabold text-brand-green tracking-widest block uppercase">ESTIMATED FEE</span>
                 <span className="text-lg font-black text-brand-green-deep block font-mono mt-0.5">
@@ -195,7 +195,7 @@ export default function ApplicationReview({ applicationId, applications, onUpdat
               <textarea 
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="승인/보완요청/반려 기각 시 민원 신청인에게 자동 발송될 국유재산 대부요율 및 철도보호지구 필수 보완 상세 내용이나 회답 소견을 2줄 내외로 작성하세요."
+                placeholder="승인/보완요청/반려 기각 시 민원 신청인에게 자동 발송될 국유재산 사용허가(임차)요율 및 철도보호지구 필수 보완 상세 내용이나 회답 소견을 2줄 내외로 작성하세요."
                 className="w-full min-h-[90px] bg-slate-50/70 border border-slate-200 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-brand-blue/80 text-gray-800 font-sans leading-relaxed shadow-inner placeholder:text-gray-400 font-medium"
                 id="reviewer_reason_textarea"
               />
@@ -226,7 +226,7 @@ export default function ApplicationReview({ applicationId, applications, onUpdat
                   id="btn_admin_reject"
                 >
                   <XSquare className="w-4.5 h-4.5" />
-                  부지대부 부적격 반려 (Reject)
+                  부지사용허가(임차) 부적격 반려 (Reject)
                 </button>
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function ApplicationReview({ applicationId, applications, onUpdat
         <div className="lg:col-span-4 glass-card p-5 space-y-5 rounded-3xl" id="timeline_sidebar">
           <div className="border-b border-slate-100 pb-3">
             <h3 className="font-sans font-black text-gray-950 text-base leading-tight tracking-tight">Application Timeline</h3>
-            <p className="text-xs text-gray-400 font-medium mt-1">국가철도공단 국유 토지 대부 심사 투명성 로그</p>
+            <p className="text-xs text-gray-400 font-medium mt-1">국가철도공단 국유 토지 사용허가(임차) 심사 투명성 로그</p>
           </div>
 
           <div className="relative border-l-2 border-brand-blue-light ml-3 pl-5 space-y-6 text-xs text-gray-600" id="timeline_steps_scroller">

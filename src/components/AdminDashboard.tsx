@@ -24,12 +24,12 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
   const activeLeasesCount = applications.filter(a => a.status === '승인').length; // 실제 승인된 건수 그대로!
   const pendingLeasesCount = applications.filter(a => a.status === '심사중' || a.status === '보완요청').length;
   
-  // 실제 승인된 대부 신청서의 월 임대료 총합 계산 (오프셋 0원 출발!)
+  // 실제 승인된 사용허가(임차) 신청서의 월 임대료 총합 계산 (오프셋 0원 출발!)
   const totalMonthlyRevenue = applications
     .filter(a => a.status === '승인')
     .reduce((sum, current) => sum + current.monthlyFee, 0);
 
-  // 2. 📊 경작·소상공인 대부 수익 추이 (Revenue Trends) 최근 5개월 실데이터 기반 동적 가공
+  // 2. 📊 경작·소상공인 사용허가(임차) 수익 추이 (Revenue Trends) 최근 5개월 실데이터 기반 동적 가공
   const months = ['1월', '2월', '3월', '4월', '5월'];
   const dynamicMonthlyRevenue = months.map((monthStr, idx) => {
     const monthNum = idx + 1; // 1, 2, 3, 4, 5
@@ -60,7 +60,7 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
   // Y축 4분할 단위 연산
   const yAxisMax = Math.ceil(maxRevenueVal / 100000) * 100000; // 10만 원 단위 올림
 
-  // 3. 🎯 대부 용도 분포 (Lease Status) 실데이터 기반 실시간 구성비 통계
+  // 3. 🎯 사용허가(임차) 용도 분포 (Lease Status) 실데이터 기반 실시간 구성비 통계
   const totalParcelsCount = (parcels || []).length || 1;
   
   const commercialCount = (parcels || []).filter(p => {
@@ -151,10 +151,10 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
           </div>
         </div>
 
-        {/* 카드 2: 활성 대부 계약 */}
+        {/* 카드 2: 활성 사용허가(임차) 계약 */}
         <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="stat_card_active_lease">
           <div className="space-y-1.5">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">ACTIVE LEASES (활성 대부건수)</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">ACTIVE LEASES (활성 사용허가(임차)건수)</span>
             <div className="text-2xl font-black text-gray-950 font-mono leading-none">{activeLeasesCount} 건</div>
             <span className="text-[10.5px] text-gray-500 block font-semibold">승인이 발효된 계약 통계</span>
           </div>
@@ -163,10 +163,10 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
           </div>
         </div>
 
-        {/* 카드 3: 월평균 대부료 */}
+        {/* 카드 3: 월평균 사용허가(임차)료 */}
         <div className="glass-card p-5 flex items-center justify-between rounded-3xl" id="stat_card_revenue">
           <div className="space-y-1.5">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">MONTHLY REVENUE (월평균 대부료)</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">MONTHLY REVENUE (월평균 사용허가(임차)료)</span>
             <div className="text-2xl font-black text-brand-green font-mono leading-none">
               {totalMonthlyRevenue >= 10000 
                 ? `₩${Math.round(totalMonthlyRevenue / 10000).toLocaleString()}만` 
@@ -202,7 +202,7 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
         <div className="glass-card p-6 lg:col-span-8 flex flex-col justify-between rounded-3xl" id="chart_revenue_trends">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-sans font-black text-gray-950 text-base leading-tight tracking-tight">Revenue Trends (실제 대부료 누적 수익 추이)</h3>
+              <h3 className="font-sans font-black text-gray-950 text-base leading-tight tracking-tight">Revenue Trends (실제 사용허가(임차)료 누적 수익 추이)</h3>
               <p className="text-xs text-gray-400 font-semibold mt-0.5">신청-심사-승인을 통과한 자산의 실시간 월별 매출액</p>
             </div>
             <div className="flex bg-slate-50 border border-slate-100 p-1 rounded-xl text-xs" id="chart_period_toggle">
@@ -251,7 +251,7 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
           <div className="flex justify-center gap-6 text-[10.5px] text-slate-455 mt-2 font-semibold">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 bg-gradient-to-t from-brand-blue to-brand-blue-deep rounded-md inline-block"></span>
-              <span>월별 실제 대부료 수익 집계액</span>
+              <span>월별 실제 사용허가(임차)료 수익 집계액</span>
             </div>
           </div>
         </div>
@@ -260,7 +260,7 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
         <div className="bg-slate-905 border border-white/10 rounded-3xl p-6 lg:col-span-4 text-white flex flex-col justify-between shadow-2xl backdrop-blur-md relative overflow-hidden" id="chart_lease_status_composition">
           <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue/10 rounded-full blur-2xl pointer-events-none" />
           <div className="space-y-1 z-10">
-            <h3 className="font-sans font-black text-base leading-tight tracking-tight">Lease Status (실시간 대부 용도 분포)</h3>
+            <h3 className="font-sans font-black text-base leading-tight tracking-tight">Lease Status (실시간 사용허가(임차) 용도 분포)</h3>
             <p className="text-xs text-brand-blue-light/70 font-medium">현재 등록된 전체 가용자산의 용도별 비중</p>
           </div>
 
@@ -297,11 +297,11 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
         </div>
       </div>
 
-      {/* 📋 하단: 최근 대부 신청 및 심사 현황 */}
+      {/* 📋 하단: 최근 사용허가(임차) 신청 및 심사 현황 */}
       <div className="glass-card p-5 rounded-3xl" id="recent_applications_card">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-sans font-black text-gray-950 text-base leading-tight tracking-tight">Recent Lease Applications (실제 대부 신청서 접수 현황)</h3>
+            <h3 className="font-sans font-black text-gray-950 text-base leading-tight tracking-tight">Recent Lease Applications (실제 사용허가(임차) 신청서 접수 현황)</h3>
             <p className="text-xs text-gray-400 font-semibold mt-0.5">시민들이 랜드버디 모바일 비서를 통해 신청 접수한 실제 리스트</p>
           </div>
           <button 
@@ -372,8 +372,8 @@ export default function AdminDashboard({ applications, parcels, onSelectApplicat
               ) : (
                 <tr>
                   <td colSpan={6} className="p-10 text-center font-sans text-gray-400">
-                    <p className="font-black text-brand-blue text-sm mb-1">접수된 대부 계약 신청서가 없습니다</p>
-                    <p className="text-xs text-gray-400 font-semibold">시민용 모바일 앱 챗봇을 통해 가상 대부 신청을 하시면 이곳에 실시간 접수됩니다.</p>
+                    <p className="font-black text-brand-blue text-sm mb-1">접수된 사용허가(임차) 계약 신청서가 없습니다</p>
+                    <p className="text-xs text-gray-400 font-semibold">시민용 모바일 앱 챗봇을 통해 가상 사용허가(임차) 신청을 하시면 이곳에 실시간 접수됩니다.</p>
                   </td>
                 </tr>
               )}
