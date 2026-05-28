@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, SlidersHorizontal, MapPin, Eye, RefreshCw, 
   Sparkles, Check, AlertCircle, Bookmark, Compass, Landmark, FileSpreadsheet, Upload, Info, FileText
@@ -569,6 +569,8 @@ export default function InventoryManagement({ parcels, onImportParcels, onSelect
   const triggerFileSelect = () => {
     fileInputRef.current?.click();
   };
+
+  return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans" id="inventory_management_root">
       {/* 타이틀 및 해설 */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4" id="inventory_header_bar">

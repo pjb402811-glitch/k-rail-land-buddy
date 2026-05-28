@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LeaseApplication, LandParcel } from './types';
-import { INITIAL_APPLICATIONS, LAND_PARCELS } from './data';
+import { INITIAL_APPLICATIONS, LAND_PARCELS, mapRawJsonToParcels } from './data';
 import LandBuddyAssistant from './components/LandBuddyAssistant';
 import AdminDashboard from './components/AdminDashboard';
 import ApplicationReview from './components/ApplicationReview';
@@ -84,6 +84,42 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('k_rail_land_buddy_apps', JSON.stringify(applications));
   }, [applications]);
+
+  // 런타임에 public/사용_임대가능토지.json 파일을 비동기 fetch 하여 초대형 자산 DB 자동 조립 탑재
+  useEffect(() => {
+    async function loadLargeLandData() {
+      try {
+        const response = await fetch('/사용_임대가능토지.json');
+        if (response.ok) {
+          const rawJson = await response.json();
+          const parsedParcels = mapRawJsonToParcels(rawJson);
+          
+          setParcels(prev => {
+            // 이미 9개 static parcels와 중복되지 않도록 방어 코드 설계
+            const staticIds = new Set(LAND_PARCELS.map(p => p.id));
+            const newFiltered = parsedParcels.filter(p => !staticIds.has(p.id));
+            
+            // 기존 LocalStorage에 저장되어 수입된 CSV/PDF 자산(예: PD-, EX-로 시작하는 것)도 보존
+            const localImported = prev.filter(p => p.id.startsWith('PD-') || p.id.startsWith('EX-'));
+            const localImportedIds = new Set(localImported.map(p => p.id));
+            
+            const finalParcels = [
+              ...LAND_PARCELS,
+              ...newFiltered.filter(p => !localImportedIds.has(p.id)),
+              ...localImported
+            ];
+            
+            // 로컬 스토리지에 동적 동기화
+            localStorage.setItem('k_rail_land_buddy_parcels', JSON.stringify(finalParcels));
+            return finalParcels;
+          });
+        }
+      } catch (err) {
+        console.warn('실제 대량 토지 JSON 비동기 fetch 실패 (데모 패키지 유지):', err);
+      }
+    }
+    loadLargeLandData();
+  }, []);
 
   // 실시간 시계 작동
   useEffect(() => {

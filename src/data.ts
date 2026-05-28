@@ -4,9 +4,8 @@
  */
 
 import { LandParcel, LeaseApplication } from './types';
-import rawLandData from '../사용(임대)가능토지_사용및매각가능토지.json';
 
-const STATIC_LAND_PARCELS: LandParcel[] = [
+export const LAND_PARCELS: LandParcel[] = [
   {
     id: 'KR-001',
     address: '대전광역시 동구 정동 1-1 (대전역 인근)',
@@ -180,96 +179,93 @@ const STATIC_LAND_PARCELS: LandParcel[] = [
   }
 ];
 
-// 100% 오픈 임대 가능 국유토지 JSON 데이터 동적 매핑 파서
-const DYNAMIC_LAND_PARCELS: LandParcel[] = (rawLandData as any[]).map((item: any, idx: number) => {
-  const seq = Number(item["순번"]) || idx + 1;
-  const regionHead = item["지역본부"] || '충청본부';
-  const lineName = item["노선명"] || '기타';
-  const address = item["소재지"] || '대전광역시 동구 정동 1-1';
-  const area = Number(item["면적(㎡)"]) || 120;
-  const restrictions = item["특이사항"] || (lineName !== '기타' ? `${lineName} 선로 변 인접지역 안전 펜스 및 철도보호지구 행위신고 검토 구역` : '특별 규제 없음 (지자체 개발 조례 적용)');
+// 100% 오픈 임대 가능 국유토지 JSON 데이터 동적 매핑 파서 (런타임 비동기 fetch 시 가설화용)
+export function mapRawJsonToParcels(rawJson: any[]): LandParcel[] {
+  return rawJson.map((item: any, idx: number) => {
+    const seq = Number(item["순번"]) || idx + 1;
+    const regionHead = item["지역본부"] || '충청본부';
+    const lineName = item["노선명"] || '기타';
+    const address = item["소재지"] || '대전광역시 동구 정동 1-1';
+    const area = Number(item["면적(㎡)"]) || 120;
+    const restrictions = item["특이사항"] || (lineName !== '기타' ? `${lineName} 선로 변 인접지역 안전 펜스 및 철도보호지구 행위신고 검토 구역` : '특별 규제 없음 (지자체 개발 조례 적용)');
 
-  // 지역본부별 그럴싸한 기준 좌표 부여 및 미세 겹침 방지 오프셋 난수화
-  let latBase = 36.35; // 충청본부 기본값 (대전)
-  let lngBase = 127.38;
-  if (regionHead.includes('강원')) {
-    latBase = 37.75;
-    lngBase = 128.87;
-  } else if (regionHead.includes('수도권') || regionHead.includes('서울')) {
-    latBase = 37.56;
-    lngBase = 126.97;
-  } else if (regionHead.includes('호남') || regionHead.includes('광주')) {
-    latBase = 35.15;
-    lngBase = 126.85;
-  } else if (regionHead.includes('영남') || regionHead.includes('대구') || regionHead.includes('부산')) {
-    latBase = 35.87;
-    lngBase = 128.60;
-  }
-  
-  // 미세 그리드 겹침 방지를 위해 순번 기반의 결정론적 분산 오프셋 생성
-  const offsetLat = ((seq * 17) % 100) / 2500 - 0.02;
-  const offsetLng = ((seq * 23) % 100) / 2500 - 0.02;
+    // 지역본부별 그럴싸한 기준 좌표 부여 및 미세 겹침 방지 오프셋 난수화
+    let latBase = 36.35; // 충청본부 기본값 (대전)
+    let lngBase = 127.38;
+    if (regionHead.includes('강원')) {
+      latBase = 37.75;
+      lngBase = 128.87;
+    } else if (regionHead.includes('수도권') || regionHead.includes('서울')) {
+      latBase = 37.56;
+      lngBase = 126.97;
+    } else if (regionHead.includes('호남') || regionHead.includes('광주')) {
+      latBase = 35.15;
+      lngBase = 126.85;
+    } else if (regionHead.includes('영남') || regionHead.includes('대구') || regionHead.includes('부산')) {
+      latBase = 35.87;
+      lngBase = 128.60;
+    }
+    
+    // 미세 그리드 겹침 방지를 위해 순번 기반의 결정론적 분산 오프셋 생성
+    const offsetLat = ((seq * 17) % 100) / 2500 - 0.02;
+    const offsetLng = ((seq * 23) % 100) / 2500 - 0.02;
 
-  // 지역본부별 맞춤형 공시지가 생성 (수도권 프리미엄 반영)
-  let price = 120000;
-  if (regionHead.includes('수도권') || regionHead.includes('서울')) {
-    price = 680000 + (seq % 10) * 75000;
-  } else if (regionHead.includes('영남') || regionHead.includes('부산')) {
-    price = 220000 + (seq % 10) * 35000;
-  } else if (regionHead.includes('충청')) {
-    price = 140000 + (seq % 10) * 15000;
-  } else {
-    price = 85000 + (seq % 10) * 8000;
-  }
+    // 지역본부별 맞춤형 공시지가 생성 (수도권 프리미엄 반영)
+    let price = 120000;
+    if (regionHead.includes('수도권') || regionHead.includes('서울')) {
+      price = 680000 + (seq % 10) * 75000;
+    } else if (regionHead.includes('영남') || regionHead.includes('부산')) {
+      price = 220000 + (seq % 10) * 35000;
+    } else if (regionHead.includes('충청')) {
+      price = 140000 + (seq % 10) * 15000;
+    } else {
+      price = 85000 + (seq % 10) * 8000;
+    }
 
-  // 면적별 맞춤형 프리미엄 용도 설계
-  let recommendedUse = '청년 예술 플리마켓 부스 및 자전거 쉼터';
-  if (area >= 1000) {
-    recommendedUse = '대규모 친환경 스마트 태양광 발전 / 자재 야적 및 물류 주차장';
-  } else if (area >= 400) {
-    recommendedUse = '도시농업 공동 주말농장 / 소상공인 공동 자재 보관소 / 야외 쉼터';
-  } else if (area >= 120) {
-    recommendedUse = '청년 창업 특화 푸드트럭 허브 / 친환경 스마트 텃밭 / 모바일 팝업스토어';
-  }
+    // 면적별 맞춤형 프리미엄 용도 설계
+    let recommendedUse = '청년 예술 플리마켓 부스 및 자전거 쉼터';
+    if (area >= 1000) {
+      recommendedUse = '대규모 친환경 스마트 태양광 발전 / 자재 야적 및 물류 주차장';
+    } else if (area >= 400) {
+      recommendedUse = '도시농업 공동 주말농장 / 소상공인 공동 자재 보관소 / 야외 쉼터';
+    } else if (area >= 120) {
+      recommendedUse = '청년 창업 특화 푸드트럭 허브 / 친환경 스마트 텃밭 / 모바일 팝업스토어';
+    }
 
-  // 프리미엄 자산 이미지 셋 순환 매핑
-  const images = [
-    'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1513828741544-cf6662767098?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=600&q=80'
-  ];
+    // 프리미엄 자산 이미지 셋 순환 매핑
+    const images = [
+      'https://images.unsplash.com/photo-1541414779247-4436ea0e17d8?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1513828741544-cf6662767098?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=600&q=80'
+    ];
 
-  return {
-    id: `KR-${String(seq + 9).padStart(4, '0')}`, // 기존 KR-001~009와 겹치지 않도록 세팅
-    address,
-    area,
-    landType: lineName === '기타' ? '대지' : '잡종지',
-    officialPrice: price,
-    recommendedUse,
-    restrictions,
-    status: '대부가능' as const,
-    region: address.split(' ')[0] || '충청남도',
-    imageUrl: images[seq % images.length],
-    latitude: parseFloat((latBase + offsetLat).toFixed(6)),
-    longitude: parseFloat((lngBase + offsetLng).toFixed(6)),
-    zoning: lineName === '기타' ? '준주거지역' : '자연녹지지역',
-    isRailwayProtected: lineName !== '기타',
-    hasRoadAccess: seq % 2 === 0,
-    waterDistance: (seq % 15) * 3 + 4,
-    electricityAccess: seq % 3 === 0 ? '가설필요' as const : '가용' as const
-  };
-});
-
-export const LAND_PARCELS: LandParcel[] = [
-  ...STATIC_LAND_PARCELS,
-  ...DYNAMIC_LAND_PARCELS
-];
+    return {
+      id: `KR-${String(seq + 9).padStart(4, '0')}`, // 기존 KR-001~009와 겹치지 않도록 세팅
+      address,
+      area,
+      landType: lineName === '기타' ? '대지' : '잡종지',
+      officialPrice: price,
+      recommendedUse,
+      restrictions,
+      status: '대부가능' as const,
+      region: address.split(' ')[0] || '충청남도',
+      imageUrl: images[seq % images.length],
+      latitude: parseFloat((latBase + offsetLat).toFixed(6)),
+      longitude: parseFloat((lngBase + offsetLng).toFixed(6)),
+      zoning: lineName === '기타' ? '준주거지역' : '자연녹지지역',
+      isRailwayProtected: lineName !== '기타',
+      hasRoadAccess: seq % 2 === 0,
+      waterDistance: (seq % 15) * 3 + 4,
+      electricityAccess: seq % 3 === 0 ? '가설필요' as const : '가용' as const
+    };
+  });
+}
 
 export const INITIAL_APPLICATIONS: LeaseApplication[] = [
   {
