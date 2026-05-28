@@ -52,11 +52,11 @@ export default function SpatialPortal({
 
   // 카카오 맵 API SDK 로드 및 초기화
   useEffect(() => {
-    const scriptId = 'kakao-map-script';
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
-    
-    // Vercel 환경변수에서 JavaScript 앱키 로드
     const jsKey = ((import.meta as any).env?.VITE_KAKAO_JS_KEY as string) || '';
+    if (!jsKey) {
+      setMapError(true);
+      return;
+    }
 
     const initMap = () => {
       try {
@@ -67,9 +67,14 @@ export default function SpatialPortal({
           return;
         }
 
+        const centerLatLng = new kakao.maps.LatLng(latitude, longitude);
+
+        // 항상 컨테이너의 내부 HTML을 비워서 지도 객체의 중복 렌더링 및 무한 루프 문제를 방지합니다. (철벽 방어!)
+        mapContainerRef.current.innerHTML = '';
+
         // 지도 옵션
         const options = {
-          center: new kakao.maps.LatLng(latitude, longitude),
+          center: centerLatLng,
           level: 3
         };
 
@@ -77,9 +82,8 @@ export default function SpatialPortal({
         setMapInstance(map);
 
         // 마커 생성
-        const markerPosition = new kakao.maps.LatLng(latitude, longitude);
         const marker = new kakao.maps.Marker({
-          position: markerPosition
+          position: centerLatLng
         });
         marker.setMap(map);
 
@@ -100,7 +104,7 @@ export default function SpatialPortal({
         // 1. 철도보호지구(isRailwayProtected)일 경우 가상 안전 펜스 (붉은 35m 반경 가이드라인) 표시
         if (isRailwayProtected) {
           const circle = new kakao.maps.Circle({
-            center : new kakao.maps.LatLng(latitude, longitude),
+            center : centerLatLng,
             radius: 35, 
             strokeWeight: 1.8,
             strokeColor: '#f43f5e',
@@ -115,7 +119,7 @@ export default function SpatialPortal({
         // 2. 인근 농업용수/소하천(waterDistance) 접근 구역 (하늘색 반경 가이드라인) 시각화
         if (waterDistance > 0) {
           const waterCircle = new kakao.maps.Circle({
-            center : new kakao.maps.LatLng(latitude, longitude),
+            center : centerLatLng,
             radius: Math.max(30, waterDistance),
             strokeWeight: 1.2,
             strokeColor: '#3b82f6',
@@ -127,43 +131,54 @@ export default function SpatialPortal({
           waterCircle.setMap(map);
         }
 
+        // 기존 토글 상태 유지 적용
+        if (showUseDistrict) {
+          map.addOverlayMapTypeId(kakao.maps.MapTypeId.USE_DISTRICT);
+        }
+        if (showSkyview) {
+          map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
+        }
+
         setMapLoaded(true);
+        setMapError(false);
       } catch (err) {
         console.error('Kakao Map init failed inside try-catch:', err);
         setMapError(true);
       }
     };
 
-    if (!script) {
-      script = document.createElement('script');
-      script.id = scriptId;
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${jsKey}&autoload=false&libraries=services`;
-      script.async = true;
-      document.head.appendChild(script);
-
-      script.onload = () => {
-        const kakao = (window as any).kakao;
-        if (kakao) {
-          kakao.maps.load(() => {
-            initMap();
-          });
-        } else {
-          setMapError(true);
-        }
-      };
-      script.onerror = () => {
-        setMapError(true);
-      };
+    const kakao = (window as any).kakao;
+    if (kakao && kakao.maps && kakao.maps.Map) {
+      // 이미 SDK가 주입 및 로드되어 있으면 즉시 초기화 실행
+      initMap();
     } else {
-      const kakao = (window as any).kakao;
-      if (kakao && kakao.maps) {
-        kakao.maps.load(() => {
-          initMap();
-        });
+      const scriptId = 'kakao-map-script';
+      let script = document.getElementById(scriptId) as HTMLScriptElement;
+
+      if (!script) {
+        script = document.createElement('script');
+        script.id = scriptId;
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${jsKey}&autoload=false&libraries=services`;
+        script.async = true;
+        document.head.appendChild(script);
+
+        script.onload = () => {
+          const k = (window as any).kakao;
+          if (k && k.maps) {
+            k.maps.load(() => {
+              initMap();
+            });
+          } else {
+            setMapError(true);
+          }
+        };
+        script.onerror = () => {
+          setMapError(true);
+        };
       } else {
         const checkInterval = setInterval(() => {
           const k = (window as any).kakao;
-          if (k && k.maps) {
+          if (k && k.maps && k.maps.load) {
             clearInterval(checkInterval);
             k.maps.load(() => {
               initMap();
@@ -173,7 +188,7 @@ export default function SpatialPortal({
         setTimeout(() => clearInterval(checkInterval), 5000);
       }
     }
-  }, [address, latitude, longitude, parcelId, isRailwayProtected, waterDistance, zoning]);
+  }, [parcelId, address, latitude, longitude, isRailwayProtected, waterDistance, zoning]);
 
   // 지도 위성/일반 토글
   const toggleMapType = (type: 'road' | 'sky') => {
@@ -259,7 +274,7 @@ export default function SpatialPortal({
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="text-[10.5px] font-bold text-gray-400 font-sans tracking-wide flex items-center gap-1.5 uppercase">
-            <MapPin className="w-3.5 h-3.5 text-brand-blue" /> 3차원 디지털트윈 공간정보 연계 (실시간 카카오맵)
+            <MapPin className="w-3.5 h-3.5 text-brand-blue" /> 실시간 카카오 2D 지적/공간 지도
           </span>
           <div className="flex items-center gap-1.5">
             {/* 위성/일반 전환 */}
@@ -303,7 +318,7 @@ export default function SpatialPortal({
           {!mapLoaded && !mapError && (
             <div className="absolute inset-0 bg-slate-50/90 backdrop-blur-xs flex flex-col items-center justify-center gap-2">
               <RefreshCw className="w-6 h-6 text-brand-blue animate-spin" />
-              <span className="text-[10px] text-slate-500 font-medium">카카오 디지털트윈 공간지도 렌더링 중...</span>
+              <span className="text-[10px] text-slate-500 font-medium">카카오 실시간 지도 로드 중...</span>
             </div>
           )}
 
